@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="zig 语法#流程控制#if#if可用来解包可选类型(?) 与 错误类型(!)
+const optional:?i32 = null; if (optional) |number:i32| { //something todo } const error: anyerror!i32 = 0; if (error) |number:i32| { //something todo }高级类型#指针#单项指针#单项指针指向单个元素。
+单项指针的类型为 *T，其中 T 是所指向的数据类型。解引用操作使用 ptr.*。
+// 代码来自 zig 语言圣经 const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { var integer: i16 = 666; const ptr = &amp;integer; ptr.* = ptr.* &#43; 1; print(&#34;{}\n&#34;, .{integer}); }多项指针#多项指针指向一个或多个连续的元素，但其数量在编译期是未知的。 TIP
+多项指针的类型为 [*]T，其中 T 是所指向的数据类型，且 T 的大小必须是明确的（这意味着它不能是 anyopaque 或其他不透明类型）
+const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const array = [_]i32{ 1, 2, 3, 4 }; const ptr: [*]const i32 = &amp;array; print(&#34;第一个元素：{}\n&#34;, .{ptr[0]}); }多个指针的区别#[4] const u8 // 该类型表示一个长度为4的数组，里面的类型 [] const u8 // 这表示是一个 内部类型为 const u8 的切片 *[4] const u8 // 表示一个指针，该指针的地址存储一个长度为4，元素为const u8的数组 *[] const u8 //这表示指针地址存储着一个切片 [*] const u8 // 表示一个多项指针 元素为const u8 但是长度未知切片与数组#切片#切片本质上是一个胖指针，内部有一个[*] T的多项指针与切片长度。
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/zig/zig-grammar/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="zig 语法#流程控制#if#if可用来解包可选类型(?) 与 错误类型(!)
+const optional:?i32 = null; if (optional) |number:i32| { //something todo } const error: anyerror!i32 = 0; if (error) |number:i32| { //something todo }高级类型#指针#单项指针#单项指针指向单个元素。
+单项指针的类型为 *T，其中 T 是所指向的数据类型。解引用操作使用 ptr.*。
+// 代码来自 zig 语言圣经 const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { var integer: i16 = 666; const ptr = &amp;integer; ptr.* = ptr.* &#43; 1; print(&#34;{}\n&#34;, .{integer}); }多项指针#多项指针指向一个或多个连续的元素，但其数量在编译期是未知的。 TIP
+多项指针的类型为 [*]T，其中 T 是所指向的数据类型，且 T 的大小必须是明确的（这意味着它不能是 anyopaque 或其他不透明类型）
+const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const array = [_]i32{ 1, 2, 3, 4 }; const ptr: [*]const i32 = &amp;array; print(&#34;第一个元素：{}\n&#34;, .{ptr[0]}); }多个指针的区别#[4] const u8 // 该类型表示一个长度为4的数组，里面的类型 [] const u8 // 这表示是一个 内部类型为 const u8 的切片 *[4] const u8 // 表示一个指针，该指针的地址存储一个长度为4，元素为const u8的数组 *[] const u8 //这表示指针地址存储着一个切片 [*] const u8 // 表示一个多项指针 元素为const u8 但是长度未知切片与数组#切片#切片本质上是一个胖指针，内部有一个[*] T的多项指针与切片长度。">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="zig 语法#流程控制#if#if可用来解包可选类型(?) 与 错误类型(!)
+const optional:?i32 = null; if (optional) |number:i32| { //something todo } const error: anyerror!i32 = 0; if (error) |number:i32| { //something todo }高级类型#指针#单项指针#单项指针指向单个元素。
+单项指针的类型为 *T，其中 T 是所指向的数据类型。解引用操作使用 ptr.*。
+// 代码来自 zig 语言圣经 const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { var integer: i16 = 666; const ptr = &amp;integer; ptr.* = ptr.* &#43; 1; print(&#34;{}\n&#34;, .{integer}); }多项指针#多项指针指向一个或多个连续的元素，但其数量在编译期是未知的。 TIP
+多项指针的类型为 [*]T，其中 T 是所指向的数据类型，且 T 的大小必须是明确的（这意味着它不能是 anyopaque 或其他不透明类型）
+const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const array = [_]i32{ 1, 2, 3, 4 }; const ptr: [*]const i32 = &amp;array; print(&#34;第一个元素：{}\n&#34;, .{ptr[0]}); }多个指针的区别#[4] const u8 // 该类型表示一个长度为4的数组，里面的类型 [] const u8 // 这表示是一个 内部类型为 const u8 的切片 *[4] const u8 // 表示一个指针，该指针的地址存储一个长度为4，元素为const u8的数组 *[] const u8 //这表示指针地址存储着一个切片 [*] const u8 // 表示一个多项指针 元素为const u8 但是长度未知切片与数组#切片#切片本质上是一个胖指针，内部有一个[*] T的多项指针与切片长度。">
+  <meta itemprop="wordCount" content="220">
+
+<title>Zig Grammar | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/zig/zig-grammar/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.cc2c524ed250aac81b23d1f4af87344917b325208841feca0968fe450f570575.css" integrity="sha256-zCxSTtJQqsgbI9H0r4c0SRezJSCIQf7KCWj&#43;RQ9XBXU=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.df496ef210ae256c52f3255c2a5f2a5929ce1a25c8e18d67586fdedb47cfb9ac.js" integrity="sha256-30lu8hCuJWxS8yVcKl8qWSnOGiXI4Y1nWG/e20fPuaw=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle" checked />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="active">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Zig Grammar</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#流程控制">流程控制</a>
+      <ul>
+        <li><a href="#if">if</a></li>
+      </ul>
+    </li>
+    <li><a href="#高级类型">高级类型</a>
+      <ul>
+        <li><a href="#指针"><code>指针</code></a></li>
+        <li><a href="#多项指针">多项指针</a></li>
+        <li><a href="#多个指针的区别">多个指针的区别</a></li>
+        <li><a href="#切片与数组">切片与数组</a></li>
+        <li><a href="#联合类型">联合类型</a></li>
+        <li><a href="#opaque-透明类型"><strong>opaque 透明类型</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#与c交互"><strong>与C交互</strong></a>
+      <ul>
+        <li><a href="#引入c头文件"><strong>引入C头文件</strong></a></li>
+        <li><a href="#引入-vcpkg"><strong>引入 vcpkg</strong></a></li>
+        <li><a href="#声明c函数"><strong>声明C函数</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#内存管理">内存管理</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="zig-语法">zig 语法<a class="anchor" href="#zig-%e8%af%ad%e6%b3%95">#</a></h1>
+<h2 id="流程控制">流程控制<a class="anchor" href="#%e6%b5%81%e7%a8%8b%e6%8e%a7%e5%88%b6">#</a></h2>
+<h3 id="if">if<a class="anchor" href="#if">#</a></h3>
+<p>if可用来解包可选类型(?) 与 错误类型(!)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> optional<span style="color:#f92672">:?</span><span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (optional) <span style="color:#f92672">|</span>number<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//something todo
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">error</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">anyerror</span><span style="color:#f92672">!</span><span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">error</span>) <span style="color:#f92672">|</span>number<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//something todo
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}</span></span></code></pre></div><h2 id="高级类型">高级类型<a class="anchor" href="#%e9%ab%98%e7%ba%a7%e7%b1%bb%e5%9e%8b">#</a></h2>
+<h3 id="指针"><code>指针</code><a class="anchor" href="#%e6%8c%87%e9%92%88">#</a></h3>
+<h4 id="单项指针">单项指针<a class="anchor" href="#%e5%8d%95%e9%a1%b9%e6%8c%87%e9%92%88">#</a></h4>
+<ul>
+<li>
+<p>单项指针指向单个元素。</p>
+</li>
+<li>
+<p>单项指针的类型为 <code>*T</code>，其中 <code>T</code> 是所指向的数据类型。解引用操作使用 <code>ptr.*</code>。</p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#75715e">// 代码来自 zig 语言圣经
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> print <span style="color:#f92672">=</span> @import(<span style="color:#e6db74">&#34;std&#34;</span>).debug.print;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() <span style="color:#f92672">!</span><span style="color:#66d9ef">void</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> integer<span style="color:#f92672">:</span> <span style="color:#66d9ef">i16</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">666</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> ptr <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>integer;
+</span></span><span style="display:flex;"><span>    ptr.<span style="color:#f92672">*</span> <span style="color:#f92672">=</span> ptr.<span style="color:#f92672">*</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">print</span>(<span style="color:#e6db74">&#34;{}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, .{integer});
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="多项指针">多项指针<a class="anchor" href="#%e5%a4%9a%e9%a1%b9%e6%8c%87%e9%92%88">#</a></h3>
+<ul>
+<li>多项指针指向一个或多个连续的元素，但其数量在编译期是未知的。</li>
+</ul>
+<blockquote class='book-hint tip'>
+<p><strong>TIP</strong><br>
+多项指针的类型为 <code>[*]T</code>，其中 <code>T</code> 是所指向的数据类型，且 <code>T</code> 的大小必须是明确的（这意味着它不能是 <a href="https://ziglang.org/documentation/master/#toc-C-Type-Primitives"><code>anyopaque</code></a> 或其他<a href="https://ziglang.org/documentation/master/#opaque">不透明类型</a>）</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> print <span style="color:#f92672">=</span> @import(<span style="color:#e6db74">&#34;std&#34;</span>).debug.print;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() <span style="color:#f92672">!</span><span style="color:#66d9ef">void</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> array <span style="color:#f92672">=</span> [_]<span style="color:#66d9ef">i32</span>{ <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> ptr<span style="color:#f92672">:</span> [<span style="color:#f92672">*</span>]<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>array;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">print</span>(<span style="color:#e6db74">&#34;第一个元素：{}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, .{ptr[<span style="color:#ae81ff">0</span>]});
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="多个指针的区别">多个指针的区别<a class="anchor" href="#%e5%a4%9a%e4%b8%aa%e6%8c%87%e9%92%88%e7%9a%84%e5%8c%ba%e5%88%ab">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span>[<span style="color:#ae81ff">4</span>] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">// 该类型表示一个长度为4的数组，里面的类型
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>[] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">// 这表示是一个 内部类型为 const u8 的切片
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#f92672">*</span>[<span style="color:#ae81ff">4</span>] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">// 表示一个指针，该指针的地址存储一个长度为4，元素为const u8的数组
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#f92672">*</span>[] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">//这表示指针地址存储着一个切片
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>[<span style="color:#f92672">*</span>] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#f92672">//</span> <span style="color:#960050;background-color:#1e0010">表示一个多项指针</span> <span style="color:#960050;background-color:#1e0010">元素为</span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#960050;background-color:#1e0010">但是长度未知</span></span></span></code></pre></div><h3 id="切片与数组">切片与数组<a class="anchor" href="#%e5%88%87%e7%89%87%e4%b8%8e%e6%95%b0%e7%bb%84">#</a></h3>
+<h4 id="切片">切片<a class="anchor" href="#%e5%88%87%e7%89%87">#</a></h4>
+<p>切片本质上是一个胖指针，内部有一个[*] T的多项指针与切片长度。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> array<span style="color:#f92672">:</span> [_] <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> [_]<span style="color:#66d9ef">i32</span>{<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> slice<span style="color:#f92672">:</span>[] <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> array[<span style="color:#ae81ff">0</span>..<span style="color:#ae81ff">4</span>];</span></span></code></pre></div><h3 id="联合类型">联合类型<a class="anchor" href="#%e8%81%94%e5%90%88%e7%b1%bb%e5%9e%8b">#</a></h3>
+<h5 id="union与tag-union"><code>union</code>与<code>tag union</code><a class="anchor" href="#union%e4%b8%8etag-union">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">union</span> {
+</span></span><span style="display:flex;"><span>  int<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>  float<span style="color:#f92672">:</span><span style="color:#66d9ef">f32</span>
+</span></span><span style="display:flex;"><span>};</span></span></code></pre></div><p><code>union</code>的缺陷是他不知道自己存储的是什么类型的数据。而<code>tag union</code>就是来解决这个问题的。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">union</span>(<span style="color:#66d9ef">enum</span>) {
+</span></span><span style="display:flex;"><span>    a<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>    b<span style="color:#f92672">:</span><span style="color:#66d9ef">f32</span>,
+</span></span><span style="display:flex;"><span>};</span></span></code></pre></div><h3 id="opaque-透明类型"><strong>opaque 透明类型</strong><a class="anchor" href="#opaque-%e9%80%8f%e6%98%8e%e7%b1%bb%e5%9e%8b">#</a></h3>
+<!-- raw HTML omitted -->
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong><br>
+几乎用不到的类型，这通常用于与 C 代码交互时，确保类型安全，尤其是在 C 代码没有公开结构体细节的情况下。</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> wat <span style="color:#f92672">=</span> opauqe {};</span></span></code></pre></div><h2 id="与c交互"><strong>与C交互</strong><a class="anchor" href="#%e4%b8%8ec%e4%ba%a4%e4%ba%92">#</a></h2>
+<h3 id="引入c头文件"><strong>引入C头文件</strong><a class="anchor" href="#%e5%bc%95%e5%85%a5c%e5%a4%b4%e6%96%87%e4%bb%b6">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> c <span style="color:#f92672">=</span> @import({
+</span></span><span style="display:flex;"><span>    @cDefine(<span style="color:#e6db74">&#34;_NO_CRT_STDIN_INLINE&#34;</span>,<span style="color:#e6db74">&#34;1&#34;</span>);
+</span></span><span style="display:flex;"><span>    @cInclude(<span style="color:#e6db74">&#34;stdio.h&#34;</span>);
+</span></span><span style="display:flex;"><span>})</span></span></code></pre></div><h3 id="引入-vcpkg"><strong>引入 vcpkg</strong><a class="anchor" href="#%e5%bc%95%e5%85%a5-vcpkg">#</a></h3>
+<h3 id="声明c函数"><strong>声明C函数</strong><a class="anchor" href="#%e5%a3%b0%e6%98%8ec%e5%87%bd%e6%95%b0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#75715e">// 声明一个C的外部函数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">extern</span> <span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">add</span> (x<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,y<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>) <span style="color:#66d9ef">i32</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 导出一个函数给c
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">add</span>(x<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,y<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>) <span style="color:#a6e22e">callconv</span>(.c) <span style="color:#66d9ef">i32</span> {};</span></span></code></pre></div><h2 id="内存管理">内存管理<a class="anchor" href="#%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86">#</a></h2>
+<p>以DebugAllocator为例.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#75715e">// 获取DebugAllocator实例
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> gpa <span style="color:#f92672">=</span> std.heap.<span style="color:#a6e22e">DebugAllocator</span>(.{}).init;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//获得分配器实例
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> dgpa <span style="color:#f92672">=</span> gpa.<span style="color:#a6e22e">allocator</span>();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 延时销毁
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">defer</span> _ <span style="color:#f92672">=</span> gpa.<span style="color:#a6e22e">deinit</span>();</span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/zig/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Zig</span>
+      </a>
+    
+    </span>
+    <span>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#流程控制">流程控制</a>
+      <ul>
+        <li><a href="#if">if</a></li>
+      </ul>
+    </li>
+    <li><a href="#高级类型">高级类型</a>
+      <ul>
+        <li><a href="#指针"><code>指针</code></a></li>
+        <li><a href="#多项指针">多项指针</a></li>
+        <li><a href="#多个指针的区别">多个指针的区别</a></li>
+        <li><a href="#切片与数组">切片与数组</a></li>
+        <li><a href="#联合类型">联合类型</a></li>
+        <li><a href="#opaque-透明类型"><strong>opaque 透明类型</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#与c交互"><strong>与C交互</strong></a>
+      <ul>
+        <li><a href="#引入c头文件"><strong>引入C头文件</strong></a></li>
+        <li><a href="#引入-vcpkg"><strong>引入 vcpkg</strong></a></li>
+        <li><a href="#声明c函数"><strong>声明C函数</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#内存管理">内存管理</a></li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
