@@ -8,17 +8,27 @@ https://github.com/alex-shpak/hugo-book
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
+<meta name="description" content="Python配置#LSP#Basedpyright#目前使用相当舒服的Python LSP 为 basedpyright 它提供类型检查、inlayhint等，可以通过pyrightconfig.json配置。
+ruff#与Basedpyright相比，ruff 提供了代码检查的功能。
+虚拟环境#uv#Rust 编写的 python虚拟环境管理工具其使用方法与Rust的cargo类似。
+">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
 <meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/python/">
   <meta property="og:site_name" content="Nazeltoの编程随记">
   <meta property="og:title" content="Python">
+  <meta property="og:description" content="Python配置#LSP#Basedpyright#目前使用相当舒服的Python LSP 为 basedpyright 它提供类型检查、inlayhint等，可以通过pyrightconfig.json配置。
+ruff#与Basedpyright相比，ruff 提供了代码检查的功能。
+虚拟环境#uv#Rust 编写的 python虚拟环境管理工具其使用方法与Rust的cargo类似。">
   <meta property="og:locale" content="zn_ch">
   <meta property="og:type" content="website">
 
 
   <meta itemprop="name" content="Python">
+  <meta itemprop="description" content="Python配置#LSP#Basedpyright#目前使用相当舒服的Python LSP 为 basedpyright 它提供类型检查、inlayhint等，可以通过pyrightconfig.json配置。
+ruff#与Basedpyright相比，ruff 提供了代码检查的功能。
+虚拟环境#uv#Rust 编写的 python虚拟环境管理工具其使用方法与Rust的cargo类似。">
+  <meta itemprop="wordCount" content="16">
 
 <title>Python | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
@@ -28,7 +38,7 @@ https://github.com/alex-shpak/hugo-book
 
 
   <script defer src="/Programming-Notes/fuse.min.js"></script>
-  <script defer src="/Programming-Notes/en.search.min.d60680591694bd1f154146dd73936b463ce5ef1505fec4f6dc2562dcf775772a.js" integrity="sha256-1gaAWRaUvR8VQUbdc5NrRjzl7xUF/sT23CVi3Pd1dyo=" crossorigin="anonymous"></script>
+  <script defer src="/Programming-Notes/en.search.min.d3b610121920a2c76e534a2cc12481102d483e305b21e02523912b566339f3c8.js" integrity="sha256-07YQEhkgosduU0oswSSBEC1IPjBbIeAlI5ErVmM588g=" crossorigin="anonymous"></script>
 
 
 <link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/docs/notes/python/index.xml" title="Nazeltoの编程随记" />
@@ -98,7 +108,7 @@ https://github.com/alex-shpak/hugo-book
   
     <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle" checked />
     <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
-      <a role="button" class="active">
+      <a href="/Programming-Notes/docs/notes/python/" class="active">
         Python</a>
       <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
     </label>
@@ -116,6 +126,20 @@ https://github.com/alex-shpak/hugo-book
   
     <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
       Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
   
 
         </li>
@@ -154,6 +178,52 @@ https://github.com/alex-shpak/hugo-book
     <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
       Zig Grammar</a>
   
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
 
         </li>
       
@@ -207,17 +277,52 @@ https://github.com/alex-shpak/hugo-book
 
   <label for="toc-control">
     
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
   </label>
 </div>
 
 
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#lsp">LSP</a>
+      <ul>
+        <li><a href="#basedpyright">Basedpyright</a></li>
+        <li><a href="#ruff">ruff</a></li>
+      </ul>
+    </li>
+    <li><a href="#虚拟环境">虚拟环境</a>
+      <ul>
+        <li><a href="#uv">uv</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
   
  
       </header>
 
       
       
-  <article class="markdown book-article"></article>
+  <article class="markdown book-article"><h1 id="python配置"><strong>Python配置</strong><a class="anchor" href="#python%e9%85%8d%e7%bd%ae">#</a></h1>
+<h2 id="lsp">LSP<a class="anchor" href="#lsp">#</a></h2>
+<h3 id="basedpyright">Basedpyright<a class="anchor" href="#basedpyright">#</a></h3>
+<p>目前使用相当舒服的Python LSP 为 basedpyright 它提供类型检查、inlayhint等，可以通过pyrightconfig.json配置。</p>
+<h3 id="ruff">ruff<a class="anchor" href="#ruff">#</a></h3>
+<p>与Basedpyright相比，ruff 提供了代码检查的功能。</p>
+<hr>
+<h2 id="虚拟环境">虚拟环境<a class="anchor" href="#%e8%99%9a%e6%8b%9f%e7%8e%af%e5%a2%83">#</a></h2>
+<h3 id="uv">uv<a class="anchor" href="#uv">#</a></h3>
+<p>Rust 编写的 python虚拟环境管理工具其使用方法与Rust的cargo类似。</p>
+</article>
  
       
 
@@ -242,10 +347,33 @@ https://github.com/alex-shpak/hugo-book
   
   
   
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Introduction</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/python/itertools/" class="flex align-center">
+        <span>Itertools</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
 
 
  
         
+  
+  <div class="book-comments">
+
+</div>
   
  
         
@@ -264,6 +392,31 @@ https://github.com/alex-shpak/hugo-book
     </div>
 
     
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#lsp">LSP</a>
+      <ul>
+        <li><a href="#basedpyright">Basedpyright</a></li>
+        <li><a href="#ruff">ruff</a></li>
+      </ul>
+    </li>
+    <li><a href="#虚拟环境">虚拟环境</a>
+      <ul>
+        <li><a href="#uv">uv</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
   
  
   </main>

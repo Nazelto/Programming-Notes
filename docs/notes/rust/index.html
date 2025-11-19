@@ -8,26 +8,26 @@ https://github.com/alex-shpak/hugo-book
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Zig#面向系统编程的编程语言其最终目的是为了代替C语言。
+<meta name="description" content="Rust 记录#记录Rust中常用的crate、Rust新增语法与unsafe Rust。
 ">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
-<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/zig/">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/rust/">
   <meta property="og:site_name" content="Nazeltoの编程随记">
-  <meta property="og:title" content="Zig">
-  <meta property="og:description" content="Zig#面向系统编程的编程语言其最终目的是为了代替C语言。">
+  <meta property="og:title" content="Rust">
+  <meta property="og:description" content="Rust 记录#记录Rust中常用的crate、Rust新增语法与unsafe Rust。">
   <meta property="og:locale" content="zn_ch">
   <meta property="og:type" content="website">
 
 
-  <meta itemprop="name" content="Zig">
-  <meta itemprop="description" content="Zig#面向系统编程的编程语言其最终目的是为了代替C语言。">
-  <meta itemprop="wordCount" content="2">
+  <meta itemprop="name" content="Rust">
+  <meta itemprop="description" content="Rust 记录#记录Rust中常用的crate、Rust新增语法与unsafe Rust。">
+  <meta itemprop="wordCount" content="4">
 
-<title>Zig | Nazeltoの编程随记</title>
+<title>Rust | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
 <link rel="manifest" href="/Programming-Notes/manifest.json">
-<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/zig/">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/rust/">
 <link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
 
 
@@ -35,7 +35,7 @@ https://github.com/alex-shpak/hugo-book
   <script defer src="/Programming-Notes/en.search.min.d3b610121920a2c76e534a2cc12481102d483e305b21e02523912b566339f3c8.js" integrity="sha256-07YQEhkgosduU0oswSSBEC1IPjBbIeAlI5ErVmM588g=" crossorigin="anonymous"></script>
 
 
-<link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/docs/notes/zig/index.xml" title="Nazeltoの编程随记" />
+<link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/docs/notes/rust/index.xml" title="Nazeltoの编程随记" />
 
   
 </head>
@@ -151,9 +151,9 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle" checked />
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
     <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
-      <a href="/Programming-Notes/docs/notes/zig/" class="active">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
         Zig</a>
       <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
     </label>
@@ -188,9 +188,9 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle" checked />
     <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
-      <a href="/Programming-Notes/docs/notes/rust/" class="">
+      <a href="/Programming-Notes/docs/notes/rust/" class="active">
         Rust</a>
       <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
     </label>
@@ -267,7 +267,7 @@ https://github.com/alex-shpak/hugo-book
     <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <h3>Zig</h3>
+  <h3>Rust</h3>
 
   <label for="toc-control">
     
@@ -281,8 +281,8 @@ https://github.com/alex-shpak/hugo-book
 
       
       
-  <article class="markdown book-article"><h1 id="zig">Zig<a class="anchor" href="#zig">#</a></h1>
-<p>面向系统编程的编程语言其最终目的是为了代替C语言。</p>
+  <article class="markdown book-article"><h1 id="rust-记录">Rust 记录<a class="anchor" href="#rust-%e8%ae%b0%e5%bd%95">#</a></h1>
+<p>记录Rust中常用的crate、Rust新增语法与unsafe Rust。</p>
 </article>
  
       
@@ -311,16 +311,16 @@ https://github.com/alex-shpak/hugo-book
   <div class="flex flex-wrap justify-between">
     <span>
     
-      <a href="/Programming-Notes/docs/notes/python/modern_python/" class="flex align-center">
+      <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="flex align-center">
         <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
-        <span>Modern Python</span>
+        <span>Zig Grammar</span>
       </a>
     
     </span>
     <span>
     
-      <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="flex align-center">
-        <span>Zig Grammar</span>
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="flex align-center">
+        <span>Rust Crate</span>
         <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
       </a>
     

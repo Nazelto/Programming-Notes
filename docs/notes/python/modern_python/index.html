@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="python笔记#python 效率提升#链式比较## 传统写法 if x &lt; 20 and x &lt; 10 # 链式比较 if 20 &gt; x &gt; 10表达式## 列表表达式 my_list: list[int] = [expr(x) for x in chain(range(1...5),range(1..5)] # 集合表达式 my_set: set[str] = {expr(x) for x in my_list} # 字典表达式 my_dict: dict[str,int] = {expr(k):expr(v) for k,v in some_dict}chain 函数提高内存效率## 惰性求值 chain(iter1,iter2)装饰器## @wrap 就是装饰器 @wrap def add(x:int,y:int) -&gt; int: 装饰器可以简单理解为在运行函数之前执行与函数执行结束之后执行一些特定的操作。
+装饰器也是函数。
+被装饰器修饰的函数将会在装饰器内部执行。
+自定义装饰器#from typing import Callable,Any from time import perf_counter,sleep # 计时装饰器 def time(func:Callable) -&gt; Callable: def wrapper(*args,**kargs) -&gt; Any: print(f&#39;Timing &#34;{func.__name__}&#34;...&#39;) start:float = perf_counter() result:Any = func(*args,**kargs) end:float = perf_counter() print(f&#39;&#34;{func.__name__}&#34; took: {end - start: .4f}s&#39;) return result return wrapper # 函数式写法 def time(func:Callable) -&gt; Callable: @wraps(func) def wrapper(*args,**kargs) -&gt; Any:上下文#with 语法 使用提供的上下文 (@cotextmanager)#python 的builtin库 内置的contextlib中contextmanager装饰器可以将生成器变为具有上下文的函数。
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/python/modern_python/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="python笔记#python 效率提升#链式比较## 传统写法 if x &lt; 20 and x &lt; 10 # 链式比较 if 20 &gt; x &gt; 10表达式## 列表表达式 my_list: list[int] = [expr(x) for x in chain(range(1...5),range(1..5)] # 集合表达式 my_set: set[str] = {expr(x) for x in my_list} # 字典表达式 my_dict: dict[str,int] = {expr(k):expr(v) for k,v in some_dict}chain 函数提高内存效率## 惰性求值 chain(iter1,iter2)装饰器## @wrap 就是装饰器 @wrap def add(x:int,y:int) -&gt; int: 装饰器可以简单理解为在运行函数之前执行与函数执行结束之后执行一些特定的操作。
+装饰器也是函数。
+被装饰器修饰的函数将会在装饰器内部执行。
+自定义装饰器#from typing import Callable,Any from time import perf_counter,sleep # 计时装饰器 def time(func:Callable) -&gt; Callable: def wrapper(*args,**kargs) -&gt; Any: print(f&#39;Timing &#34;{func.__name__}&#34;...&#39;) start:float = perf_counter() result:Any = func(*args,**kargs) end:float = perf_counter() print(f&#39;&#34;{func.__name__}&#34; took: {end - start: .4f}s&#39;) return result return wrapper # 函数式写法 def time(func:Callable) -&gt; Callable: @wraps(func) def wrapper(*args,**kargs) -&gt; Any:上下文#with 语法 使用提供的上下文 (@cotextmanager)#python 的builtin库 内置的contextlib中contextmanager装饰器可以将生成器变为具有上下文的函数。">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="python笔记#python 效率提升#链式比较## 传统写法 if x &lt; 20 and x &lt; 10 # 链式比较 if 20 &gt; x &gt; 10表达式## 列表表达式 my_list: list[int] = [expr(x) for x in chain(range(1...5),range(1..5)] # 集合表达式 my_set: set[str] = {expr(x) for x in my_list} # 字典表达式 my_dict: dict[str,int] = {expr(k):expr(v) for k,v in some_dict}chain 函数提高内存效率## 惰性求值 chain(iter1,iter2)装饰器## @wrap 就是装饰器 @wrap def add(x:int,y:int) -&gt; int: 装饰器可以简单理解为在运行函数之前执行与函数执行结束之后执行一些特定的操作。
+装饰器也是函数。
+被装饰器修饰的函数将会在装饰器内部执行。
+自定义装饰器#from typing import Callable,Any from time import perf_counter,sleep # 计时装饰器 def time(func:Callable) -&gt; Callable: def wrapper(*args,**kargs) -&gt; Any: print(f&#39;Timing &#34;{func.__name__}&#34;...&#39;) start:float = perf_counter() result:Any = func(*args,**kargs) end:float = perf_counter() print(f&#39;&#34;{func.__name__}&#34; took: {end - start: .4f}s&#39;) return result return wrapper # 函数式写法 def time(func:Callable) -&gt; Callable: @wraps(func) def wrapper(*args,**kargs) -&gt; Any:上下文#with 语法 使用提供的上下文 (@cotextmanager)#python 的builtin库 内置的contextlib中contextmanager装饰器可以将生成器变为具有上下文的函数。">
+  <meta itemprop="wordCount" content="188">
+
+<title>Modern Python | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/python/modern_python/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.d3b610121920a2c76e534a2cc12481102d483e305b21e02523912b566339f3c8.js" integrity="sha256-07YQEhkgosduU0oswSSBEC1IPjBbIeAlI5ErVmM588g=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle" checked />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="active">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Modern Python</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#python-效率提升">python 效率提升</a>
+      <ul>
+        <li></li>
+        <li><a href="#装饰器">装饰器</a></li>
+      </ul>
+    </li>
+    <li><a href="#上下文">上下文</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#面向对象">面向对象</a>
+      <ul>
+        <li></li>
+        <li><a href="#枚举">枚举</a></li>
+        <li><a href="#实例方法类方法静态方法">实例方法·类方法·静态方法</a></li>
+      </ul>
+    </li>
+    <li><a href="#函数式编程">函数式编程</a>
+      <ul>
+        <li><a href="#pymonad">pymonad</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="python笔记">python笔记<a class="anchor" href="#python%e7%ac%94%e8%ae%b0">#</a></h1>
+<h2 id="python-效率提升">python 效率提升<a class="anchor" href="#python-%e6%95%88%e7%8e%87%e6%8f%90%e5%8d%87">#</a></h2>
+<h5 id="链式比较">链式比较<a class="anchor" href="#%e9%93%be%e5%bc%8f%e6%af%94%e8%be%83">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 传统写法</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> x <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">20</span> <span style="color:#f92672">and</span> x <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 链式比较</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#ae81ff">20</span> <span style="color:#f92672">&gt;</span> x <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">10</span></span></span></code></pre></div><h5 id="表达式">表达式<a class="anchor" href="#%e8%a1%a8%e8%be%be%e5%bc%8f">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 列表表达式</span>
+</span></span><span style="display:flex;"><span>my_list: list[int] <span style="color:#f92672">=</span> [expr(x) <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> chain(range(<span style="color:#ae81ff">1.</span><span style="color:#f92672">.</span><span style="color:#ae81ff">.5</span>),range(<span style="color:#ae81ff">1..5</span>)]
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 集合表达式</span>
+</span></span><span style="display:flex;"><span>my_set: set[str] <span style="color:#f92672">=</span> {expr(x) <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> my_list}
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 字典表达式</span>
+</span></span><span style="display:flex;"><span>my_dict: dict[str,int] <span style="color:#f92672">=</span> {expr(k):expr(v) <span style="color:#66d9ef">for</span> k,v <span style="color:#f92672">in</span> some_dict}</span></span></code></pre></div><h5 id="chain-函数提高内存效率">chain 函数提高内存效率<a class="anchor" href="#chain-%e5%87%bd%e6%95%b0%e6%8f%90%e9%ab%98%e5%86%85%e5%ad%98%e6%95%88%e7%8e%87">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 惰性求值</span>
+</span></span><span style="display:flex;"><span>chain(iter1,iter2)</span></span></code></pre></div><h3 id="装饰器">装饰器<a class="anchor" href="#%e8%a3%85%e9%a5%b0%e5%99%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># @wrap 就是装饰器</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@wrap</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(x:int,y:int) <span style="color:#f92672">-&gt;</span> int:</span></span></code></pre></div><ol>
+<li>
+<p>装饰器可以简单理解为在运行函数之前执行与函数执行结束之后执行一些特定的操作。</p>
+</li>
+<li>
+<p>装饰器也是函数。</p>
+</li>
+<li>
+<p>被装饰器修饰的函数将会在装饰器内部执行。</p>
+</li>
+</ol>
+<h5 id="自定义装饰器">自定义装饰器<a class="anchor" href="#%e8%87%aa%e5%ae%9a%e4%b9%89%e8%a3%85%e9%a5%b0%e5%99%a8">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Callable,Any
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> time <span style="color:#f92672">import</span> perf_counter,sleep
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 计时装饰器</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">time</span>(func:Callable) <span style="color:#f92672">-&gt;</span> Callable:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">wrapper</span>(<span style="color:#f92672">*</span>args,<span style="color:#f92672">**</span>kargs) <span style="color:#f92672">-&gt;</span> Any:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Timing &#34;</span><span style="color:#e6db74">{</span>func<span style="color:#f92672">.</span>__name__<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;...&#39;</span>)
+</span></span><span style="display:flex;"><span>        start:float <span style="color:#f92672">=</span> perf_counter()
+</span></span><span style="display:flex;"><span>        result:Any <span style="color:#f92672">=</span> func(<span style="color:#f92672">*</span>args,<span style="color:#f92672">**</span>kargs)
+</span></span><span style="display:flex;"><span>        end:float <span style="color:#f92672">=</span> perf_counter()
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;&#34;</span><span style="color:#e6db74">{</span>func<span style="color:#f92672">.</span>__name__<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; took: </span><span style="color:#e6db74">{</span>end <span style="color:#f92672">-</span> start<span style="color:#e6db74">:</span><span style="color:#e6db74"> .4f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">s&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> wrapper
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 函数式写法</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">time</span>(func:Callable) <span style="color:#f92672">-&gt;</span> Callable:
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@wraps</span>(func)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">wrapper</span>(<span style="color:#f92672">*</span>args,<span style="color:#f92672">**</span>kargs) <span style="color:#f92672">-&gt;</span> Any:</span></span></code></pre></div><h2 id="上下文">上下文<a class="anchor" href="#%e4%b8%8a%e4%b8%8b%e6%96%87">#</a></h2>
+<h5 id="with-语法-使用提供的上下文-cotextmanager">with 语法 使用提供的上下文 (@cotextmanager)<a class="anchor" href="#with-%e8%af%ad%e6%b3%95-%e4%bd%bf%e7%94%a8%e6%8f%90%e4%be%9b%e7%9a%84%e4%b8%8a%e4%b8%8b%e6%96%87-cotextmanager">#</a></h5>
+<p><code>python</code> 的<code>builtin</code>库 内置的<code>contextlib</code>中<code>contextmanager</code>装饰器可以将生成器变为具有上下文的函数。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> contextlib <span style="color:#f92672">import</span> contextmanager
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@contextmanager</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">file_handle</span>() <span style="color:#f92672">-&gt;</span> Geneator[File,<span style="color:#66d9ef">None</span>,<span style="color:#66d9ef">None</span>]:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 函数逻辑</span></span></span></code></pre></div><p>也可使用类来提供一个上下文需要类的实现<code>__enter__</code>与<code>__exit__</code>函数</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">File</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__enter__</span>(self):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__exit__</span>(self):</span></span></code></pre></div><h2 id="面向对象">面向对象<a class="anchor" href="#%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1">#</a></h2>
+<h4 id="__furture__"><code>__furture__</code><a class="anchor" href="#__furture__">#</a></h4>
+<p>用于在类或枚举中使用自己的类型</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> __future__ <span style="color:#f92672">import</span> annotations</span></span></code></pre></div><h3 id="枚举">枚举<a class="anchor" href="#%e6%9e%9a%e4%b8%be">#</a></h3>
+<blockquote class='book-hint warning'>
+<p><strong>WARNING</strong> <br>
+通常枚举不可以使用@dataclass装饰器。但是在运行时不会报错。</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># lsp 会提示这样使用是错误的</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@dataclass</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Type</span>(Enum):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 正确用法</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Type</span>(Enum):
+</span></span><span style="display:flex;"><span>    Some <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span></span></span></code></pre></div><h3 id="实例方法类方法静态方法">实例方法·类方法·静态方法<a class="anchor" href="#%e5%ae%9e%e4%be%8b%e6%96%b9%e6%b3%95%e7%b1%bb%e6%96%b9%e6%b3%95%e9%9d%99%e6%80%81%e6%96%b9%e6%b3%95">#</a></h3>
+<blockquote class='book-hint tip'>
+<p>类方法是针对类的，实例方法是针对实例的，静态方法是针对类和实例的。<br>
+类方法常用于提供额外的构造对象的方式，作为__init__方法的补充。</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 静态方法</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@staticmethod</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 类方法</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@classmethod</span></span></span></code></pre></div><h2 id="函数式编程">函数式编程<a class="anchor" href="#%e5%87%bd%e6%95%b0%e5%bc%8f%e7%bc%96%e7%a8%8b">#</a></h2>
+<h3 id="pymonad">pymonad<a class="anchor" href="#pymonad">#</a></h3>
+<h4 id="函数组合">函数组合<a class="anchor" href="#%e5%87%bd%e6%95%b0%e7%bb%84%e5%90%88">#</a></h4>
+<h5 id="compose">Compose<a class="anchor" href="#compose">#</a></h5>
+<p>使用<code>Compose</code>的函数必须有一个参数，可以用None代替。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> pymonad.reader <span style="color:#f92672">import</span> Compose
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(placeHolder <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Compose(add)<span style="color:#f92672">.</span>then(mul)</span></span></code></pre></div><h5 id="pipe">Pipe<a class="anchor" href="#pipe">#</a></h5>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/python/itertools/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Itertools</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/zig/" class="flex align-center">
+        <span>Zig</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#python-效率提升">python 效率提升</a>
+      <ul>
+        <li></li>
+        <li><a href="#装饰器">装饰器</a></li>
+      </ul>
+    </li>
+    <li><a href="#上下文">上下文</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#面向对象">面向对象</a>
+      <ul>
+        <li></li>
+        <li><a href="#枚举">枚举</a></li>
+        <li><a href="#实例方法类方法静态方法">实例方法·类方法·静态方法</a></li>
+      </ul>
+    </li>
+    <li><a href="#函数式编程">函数式编程</a>
+      <ul>
+        <li><a href="#pymonad">pymonad</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
