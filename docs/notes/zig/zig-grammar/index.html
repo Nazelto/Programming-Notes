@@ -48,7 +48,7 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
 
 
   <script defer src="/Programming-Notes/fuse.min.js"></script>
-  <script defer src="/Programming-Notes/en.search.min.df496ef210ae256c52f3255c2a5f2a5929ce1a25c8e18d67586fdedb47cfb9ac.js" integrity="sha256-30lu8hCuJWxS8yVcKl8qWSnOGiXI4Y1nWG/e20fPuaw=" crossorigin="anonymous"></script>
+  <script defer src="/Programming-Notes/en.search.min.d60680591694bd1f154146dd73936b463ce5ef1505fec4f6dc2562dcf775772a.js" integrity="sha256-1gaAWRaUvR8VQUbdc5NrRjzl7xUF/sT23CVi3Pd1dyo=" crossorigin="anonymous"></script>
 
 
 
@@ -107,6 +107,43 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
 
           
   <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a role="button" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
     
       
         <li>
@@ -201,17 +238,17 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#流程控制">流程控制</a>
+    <li><a href="#流程控制"><strong>流程控制</strong></a>
       <ul>
         <li><a href="#if">if</a></li>
       </ul>
     </li>
-    <li><a href="#高级类型">高级类型</a>
+    <li><a href="#高级类型"><strong>高级类型</strong></a>
       <ul>
-        <li><a href="#指针"><code>指针</code></a></li>
+        <li><a href="#指针"><strong>指针</strong></a></li>
         <li><a href="#多项指针">多项指针</a></li>
         <li><a href="#多个指针的区别">多个指针的区别</a></li>
-        <li><a href="#切片与数组">切片与数组</a></li>
+        <li><a href="#切片与数组"><strong>切片与数组</strong></a></li>
         <li><a href="#联合类型">联合类型</a></li>
         <li><a href="#opaque-透明类型"><strong>opaque 透明类型</strong></a></li>
       </ul>
@@ -223,7 +260,7 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
         <li><a href="#声明c函数"><strong>声明C函数</strong></a></li>
       </ul>
     </li>
-    <li><a href="#内存管理">内存管理</a></li>
+    <li><a href="#内存管理"><strong>内存管理</strong></a></li>
   </ul>
 </nav>
 
@@ -236,8 +273,8 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
 
       
       
-  <article class="markdown book-article"><h1 id="zig-语法">zig 语法<a class="anchor" href="#zig-%e8%af%ad%e6%b3%95">#</a></h1>
-<h2 id="流程控制">流程控制<a class="anchor" href="#%e6%b5%81%e7%a8%8b%e6%8e%a7%e5%88%b6">#</a></h2>
+  <article class="markdown book-article"><h1 id="zig-语法"><strong>zig 语法</strong><a class="anchor" href="#zig-%e8%af%ad%e6%b3%95">#</a></h1>
+<h2 id="流程控制"><strong>流程控制</strong><a class="anchor" href="#%e6%b5%81%e7%a8%8b%e6%8e%a7%e5%88%b6">#</a></h2>
 <h3 id="if">if<a class="anchor" href="#if">#</a></h3>
 <p>if可用来解包可选类型(?) 与 错误类型(!)</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> optional<span style="color:#f92672">:?</span><span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
@@ -247,8 +284,8 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">error</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">anyerror</span><span style="color:#f92672">!</span><span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">error</span>) <span style="color:#f92672">|</span>number<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">|</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#75715e">//something todo
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}</span></span></code></pre></div><h2 id="高级类型">高级类型<a class="anchor" href="#%e9%ab%98%e7%ba%a7%e7%b1%bb%e5%9e%8b">#</a></h2>
-<h3 id="指针"><code>指针</code><a class="anchor" href="#%e6%8c%87%e9%92%88">#</a></h3>
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}</span></span></code></pre></div><h2 id="高级类型"><strong>高级类型</strong><a class="anchor" href="#%e9%ab%98%e7%ba%a7%e7%b1%bb%e5%9e%8b">#</a></h2>
+<h3 id="指针"><strong>指针</strong><a class="anchor" href="#%e6%8c%87%e9%92%88">#</a></h3>
 <h4 id="单项指针">单项指针<a class="anchor" href="#%e5%8d%95%e9%a1%b9%e6%8c%87%e9%92%88">#</a></h4>
 <ul>
 <li>
@@ -285,7 +322,7 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>[] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">// 这表示是一个 内部类型为 const u8 的切片
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#f92672">*</span>[<span style="color:#ae81ff">4</span>] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">// 表示一个指针，该指针的地址存储一个长度为4，元素为const u8的数组
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#f92672">*</span>[] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#75715e">//这表示指针地址存储着一个切片
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>[<span style="color:#f92672">*</span>] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#f92672">//</span> <span style="color:#960050;background-color:#1e0010">表示一个多项指针</span> <span style="color:#960050;background-color:#1e0010">元素为</span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#960050;background-color:#1e0010">但是长度未知</span></span></span></code></pre></div><h3 id="切片与数组">切片与数组<a class="anchor" href="#%e5%88%87%e7%89%87%e4%b8%8e%e6%95%b0%e7%bb%84">#</a></h3>
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>[<span style="color:#f92672">*</span>] <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#f92672">//</span> <span style="color:#960050;background-color:#1e0010">表示一个多项指针</span> <span style="color:#960050;background-color:#1e0010">元素为</span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">u8</span> <span style="color:#960050;background-color:#1e0010">但是长度未知</span></span></span></code></pre></div><h3 id="切片与数组"><strong>切片与数组</strong><a class="anchor" href="#%e5%88%87%e7%89%87%e4%b8%8e%e6%95%b0%e7%bb%84">#</a></h3>
 <h4 id="切片">切片<a class="anchor" href="#%e5%88%87%e7%89%87">#</a></h4>
 <p>切片本质上是一个胖指针，内部有一个[*] T的多项指针与切片长度。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> array<span style="color:#f92672">:</span> [_] <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> [_]<span style="color:#66d9ef">i32</span>{<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>};
@@ -313,7 +350,7 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">extern</span> <span style="color:#e6db74">&#34;C&#34;</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">add</span> (x<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,y<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>) <span style="color:#66d9ef">i32</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// 导出一个函数给c
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">add</span>(x<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,y<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>) <span style="color:#a6e22e">callconv</span>(.c) <span style="color:#66d9ef">i32</span> {};</span></span></code></pre></div><h2 id="内存管理">内存管理<a class="anchor" href="#%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86">#</a></h2>
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">add</span>(x<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>,y<span style="color:#f92672">:</span><span style="color:#66d9ef">i32</span>) <span style="color:#a6e22e">callconv</span>(.c) <span style="color:#66d9ef">i32</span> {};</span></span></code></pre></div><h2 id="内存管理"><strong>内存管理</strong><a class="anchor" href="#%e5%86%85%e5%ad%98%e7%ae%a1%e7%90%86">#</a></h2>
 <p>以DebugAllocator为例.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zig" data-lang="zig"><span style="display:flex;"><span><span style="color:#75715e">// 获取DebugAllocator实例
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> gpa <span style="color:#f92672">=</span> std.heap.<span style="color:#a6e22e">DebugAllocator</span>(.{}).init;
@@ -392,17 +429,17 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
   
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#流程控制">流程控制</a>
+    <li><a href="#流程控制"><strong>流程控制</strong></a>
       <ul>
         <li><a href="#if">if</a></li>
       </ul>
     </li>
-    <li><a href="#高级类型">高级类型</a>
+    <li><a href="#高级类型"><strong>高级类型</strong></a>
       <ul>
-        <li><a href="#指针"><code>指针</code></a></li>
+        <li><a href="#指针"><strong>指针</strong></a></li>
         <li><a href="#多项指针">多项指针</a></li>
         <li><a href="#多个指针的区别">多个指针的区别</a></li>
-        <li><a href="#切片与数组">切片与数组</a></li>
+        <li><a href="#切片与数组"><strong>切片与数组</strong></a></li>
         <li><a href="#联合类型">联合类型</a></li>
         <li><a href="#opaque-透明类型"><strong>opaque 透明类型</strong></a></li>
       </ul>
@@ -414,7 +451,7 @@ const print = @import(&#34;std&#34;).debug.print; pub fn main() !void { const ar
         <li><a href="#声明c函数"><strong>声明C函数</strong></a></li>
       </ul>
     </li>
-    <li><a href="#内存管理">内存管理</a></li>
+    <li><a href="#内存管理"><strong>内存管理</strong></a></li>
   </ul>
 </nav>
 

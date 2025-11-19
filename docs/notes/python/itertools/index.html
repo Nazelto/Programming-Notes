@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="# Python itertools 模块方法介绍#itertools 模块提供了一系列用于高效循环的迭代器函数，以下是主要方法的简单介绍：
+无限迭代器#count(start=0, step=1)#NOTE
+从 start 开始，以 step 为步长无限计数
+count(10) → 10, 11, 12, 13, ...cycle(iterable)#NOTE
+无限重复迭代器中的元素
+cycle(&#39;ABCD&#39;) → A B C D A B C D ...repeat(object[, times])#NOTE
+重复对象指定次数或无限重复
+repeat(10, 3) → 10, 10, 10有限迭代器#accumulate(iterable[, func])#NOTE
+返回累积值（默认求和）
+accumulate([1,2,3,4,5]) → 1, 3, 6, 10, 15chain(*iterables)#NOTE
+将多个迭代器连接成一个
+chain(&#39;ABC&#39;, &#39;DEF&#39;) → A B C D E Fchain.from_iterable(iterable)#NOTE
+从可迭代对象中链式连接
+chain.from_iterable([&#39;ABC&#39;, &#39;DEF&#39;]) → A B C D E Fcompress(data, selectors)#NOTE
+根据选择器筛选数据
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/python/itertools/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="# Python itertools 模块方法介绍#itertools 模块提供了一系列用于高效循环的迭代器函数，以下是主要方法的简单介绍：
+无限迭代器#count(start=0, step=1)#NOTE
+从 start 开始，以 step 为步长无限计数
+count(10) → 10, 11, 12, 13, ...cycle(iterable)#NOTE
+无限重复迭代器中的元素
+cycle(&#39;ABCD&#39;) → A B C D A B C D ...repeat(object[, times])#NOTE
+重复对象指定次数或无限重复
+repeat(10, 3) → 10, 10, 10有限迭代器#accumulate(iterable[, func])#NOTE
+返回累积值（默认求和）
+accumulate([1,2,3,4,5]) → 1, 3, 6, 10, 15chain(*iterables)#NOTE
+将多个迭代器连接成一个
+chain(&#39;ABC&#39;, &#39;DEF&#39;) → A B C D E Fchain.from_iterable(iterable)#NOTE
+从可迭代对象中链式连接
+chain.from_iterable([&#39;ABC&#39;, &#39;DEF&#39;]) → A B C D E Fcompress(data, selectors)#NOTE
+根据选择器筛选数据">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="# Python itertools 模块方法介绍#itertools 模块提供了一系列用于高效循环的迭代器函数，以下是主要方法的简单介绍：
+无限迭代器#count(start=0, step=1)#NOTE
+从 start 开始，以 step 为步长无限计数
+count(10) → 10, 11, 12, 13, ...cycle(iterable)#NOTE
+无限重复迭代器中的元素
+cycle(&#39;ABCD&#39;) → A B C D A B C D ...repeat(object[, times])#NOTE
+重复对象指定次数或无限重复
+repeat(10, 3) → 10, 10, 10有限迭代器#accumulate(iterable[, func])#NOTE
+返回累积值（默认求和）
+accumulate([1,2,3,4,5]) → 1, 3, 6, 10, 15chain(*iterables)#NOTE
+将多个迭代器连接成一个
+chain(&#39;ABC&#39;, &#39;DEF&#39;) → A B C D E Fchain.from_iterable(iterable)#NOTE
+从可迭代对象中链式连接
+chain.from_iterable([&#39;ABC&#39;, &#39;DEF&#39;]) → A B C D E Fcompress(data, selectors)#NOTE
+根据选择器筛选数据">
+  <meta itemprop="wordCount" content="252">
+
+<title>Itertools | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/python/itertools/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.d60680591694bd1f154146dd73936b463ce5ef1505fec4f6dc2562dcf775772a.js" integrity="sha256-1gaAWRaUvR8VQUbdc5NrRjzl7xUF/sT23CVi3Pd1dyo=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle" checked />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a role="button" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="active">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Itertools</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#无限迭代器">无限迭代器</a>
+      <ul>
+        <li><a href="#countstart0-step1"><code>count(start=0, step=1)</code></a></li>
+        <li><a href="#cycleiterable"><code>cycle(iterable)</code></a></li>
+        <li><a href="#repeatobject-times"><code>repeat(object[, times])</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#有限迭代器">有限迭代器</a>
+      <ul>
+        <li><a href="#accumulateiterable-func"><code>accumulate(iterable[, func])</code></a></li>
+        <li><a href="#chainiterables"><code>chain(*iterables)</code></a></li>
+        <li><a href="#chainfrom_iterableiterable"><code>chain.from_iterable(iterable)</code></a></li>
+        <li><a href="#compressdata-selectors"><code>compress(data, selectors)</code></a></li>
+        <li><a href="#dropwhilepredicate-iterable"><code>dropwhile(predicate, iterable)</code></a></li>
+        <li><a href="#filterfalsepredicate-iterable"><code>filterfalse(predicate, iterable)</code></a></li>
+        <li><a href="#groupbyiterable-keynone"><code>groupby(iterable, key=None)</code></a></li>
+        <li><a href="#isliceiterable-stop--isliceiterable-start-stop-step"><code>islice(iterable, stop)</code> / <code>islice(iterable, start, stop[, step])</code></a></li>
+        <li><a href="#starmapfunction-iterable"><code>starmap(function, iterable)</code></a></li>
+        <li><a href="#takewhilepredicate-iterable"><code>takewhile(predicate, iterable)</code></a></li>
+        <li><a href="#teeiterable-n2"><code>tee(iterable, n=2)</code></a></li>
+        <li><a href="#zip_longestiterables-fillvaluenone"><code>zip_longest(*iterables, fillvalue=None)</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#组合迭代器">组合迭代器</a>
+      <ul>
+        <li><a href="#productiterables-repeat1"><code>product(*iterables, repeat=1)</code></a></li>
+        <li><a href="#permutationsiterable-rnone"><code>permutations(iterable, r=None)</code></a></li>
+        <li><a href="#combinationsiterable-r"><code>combinations(iterable, r)</code></a></li>
+        <li><a href="#combinations_with_replacementiterable-r"><code>combinations_with_replacement(iterable, r)</code></a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h5 id="-python-itertools-模块方法介绍"># Python itertools 模块方法介绍<a class="anchor" href="#-python-itertools-%e6%a8%a1%e5%9d%97%e6%96%b9%e6%b3%95%e4%bb%8b%e7%bb%8d">#</a></h5>
+<p><code>itertools</code> 模块提供了一系列用于高效循环的迭代器函数，以下是主要方法的简单介绍：</p>
+<h2 id="无限迭代器">无限迭代器<a class="anchor" href="#%e6%97%a0%e9%99%90%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h2>
+<h3 id="countstart0-step1"><code>count(start=0, step=1)</code><a class="anchor" href="#countstart0-step1">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>从 start 开始，以 step 为步长无限计数</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>count(<span style="color:#ae81ff">10</span>) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">12</span>, <span style="color:#ae81ff">13</span>, <span style="color:#f92672">...</span></span></span></code></pre></div><h3 id="cycleiterable"><code>cycle(iterable)</code><a class="anchor" href="#cycleiterable">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>无限重复迭代器中的元素</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>cycle(<span style="color:#e6db74">&#39;ABCD&#39;</span>) <span style="color:#960050;background-color:#1e0010">→</span> A B C D A B C D <span style="color:#f92672">...</span></span></span></code></pre></div><h3 id="repeatobject-times"><code>repeat(object[, times])</code><a class="anchor" href="#repeatobject-times">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>重复对象指定次数或无限重复</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>repeat(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">3</span>) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">10</span></span></span></code></pre></div><h2 id="有限迭代器">有限迭代器<a class="anchor" href="#%e6%9c%89%e9%99%90%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h2>
+<h3 id="accumulateiterable-func"><code>accumulate(iterable[, func])</code><a class="anchor" href="#accumulateiterable-func">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>返回累积值（默认求和）</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>accumulate([<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">5</span>]) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">15</span></span></span></code></pre></div><h3 id="chainiterables"><code>chain(*iterables)</code><a class="anchor" href="#chainiterables">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>将多个迭代器连接成一个</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>chain(<span style="color:#e6db74">&#39;ABC&#39;</span>, <span style="color:#e6db74">&#39;DEF&#39;</span>) <span style="color:#960050;background-color:#1e0010">→</span> A B C D E F</span></span></code></pre></div><h3 id="chainfrom_iterableiterable"><code>chain.from_iterable(iterable)</code><a class="anchor" href="#chainfrom_iterableiterable">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>从可迭代对象中链式连接</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>chain<span style="color:#f92672">.</span>from_iterable([<span style="color:#e6db74">&#39;ABC&#39;</span>, <span style="color:#e6db74">&#39;DEF&#39;</span>]) <span style="color:#960050;background-color:#1e0010">→</span> A B C D E F</span></span></code></pre></div><h3 id="compressdata-selectors"><code>compress(data, selectors)</code><a class="anchor" href="#compressdata-selectors">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>根据选择器筛选数据</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>compress(<span style="color:#e6db74">&#39;ABCDEF&#39;</span>, [<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>]) <span style="color:#960050;background-color:#1e0010">→</span> A C E F</span></span></code></pre></div><h3 id="dropwhilepredicate-iterable"><code>dropwhile(predicate, iterable)</code><a class="anchor" href="#dropwhilepredicate-iterable">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>当 predicate 为真时丢弃元素，然后返回剩余所有</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dropwhile(<span style="color:#66d9ef">lambda</span> x: x<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">5</span>, [<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">1</span>]) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">1</span></span></span></code></pre></div><h3 id="filterfalsepredicate-iterable"><code>filterfalse(predicate, iterable)</code><a class="anchor" href="#filterfalsepredicate-iterable">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>返回 predicate 为假的元素</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>filterfalse(<span style="color:#66d9ef">lambda</span> x: x<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span>, range(<span style="color:#ae81ff">10</span>)) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">8</span></span></span></code></pre></div><h3 id="groupbyiterable-keynone"><code>groupby(iterable, key=None)</code><a class="anchor" href="#groupbyiterable-keynone">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>按键分组相邻的重复元素</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>[k <span style="color:#66d9ef">for</span> k, g <span style="color:#f92672">in</span> groupby(<span style="color:#e6db74">&#39;AAAABBBCCDAABBB&#39;</span>)] <span style="color:#960050;background-color:#1e0010">→</span> A B C D A B</span></span></code></pre></div><h3 id="isliceiterable-stop--isliceiterable-start-stop-step"><code>islice(iterable, stop)</code> / <code>islice(iterable, start, stop[, step])</code><a class="anchor" href="#isliceiterable-stop--isliceiterable-start-stop-step">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>对迭代器进行切片</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>islice(<span style="color:#e6db74">&#39;ABCDEFG&#39;</span>, <span style="color:#ae81ff">2</span>, <span style="color:#66d9ef">None</span>) <span style="color:#960050;background-color:#1e0010">→</span> C D E F G</span></span></code></pre></div><h3 id="starmapfunction-iterable"><code>starmap(function, iterable)</code><a class="anchor" href="#starmapfunction-iterable">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>将参数从迭代器中解包后应用函数</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>starmap(pow, [(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">5</span>), (<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">2</span>), (<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">3</span>)]) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">32</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">1000</span></span></span></code></pre></div><h3 id="takewhilepredicate-iterable"><code>takewhile(predicate, iterable)</code><a class="anchor" href="#takewhilepredicate-iterable">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>当 predicate 为真时获取元素</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>takewhile(<span style="color:#66d9ef">lambda</span> x: x<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">5</span>, [<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">1</span>]) <span style="color:#960050;background-color:#1e0010">→</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span></span></span></code></pre></div><h3 id="teeiterable-n2"><code>tee(iterable, n=2)</code><a class="anchor" href="#teeiterable-n2">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>将一个迭代器拆分为 n 个独立的迭代器</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>a, b <span style="color:#f92672">=</span> tee(range(<span style="color:#ae81ff">5</span>))</span></span></code></pre></div><h3 id="zip_longestiterables-fillvaluenone"><code>zip_longest(*iterables, fillvalue=None)</code><a class="anchor" href="#zip_longestiterables-fillvaluenone">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>类似于 zip，但以最长迭代器为准，用 fillvalue 填充</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>zip_longest(<span style="color:#e6db74">&#39;ABCD&#39;</span>, <span style="color:#e6db74">&#39;xy&#39;</span>, fillvalue<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;-&#39;</span>) <span style="color:#960050;background-color:#1e0010">→</span> Ax By C<span style="color:#f92672">-</span> D<span style="color:#f92672">-</span></span></span></code></pre></div><h2 id="组合迭代器">组合迭代器<a class="anchor" href="#%e7%bb%84%e5%90%88%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h2>
+<h3 id="productiterables-repeat1"><code>product(*iterables, repeat=1)</code><a class="anchor" href="#productiterables-repeat1">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>计算笛卡尔积</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>product(<span style="color:#e6db74">&#39;AB&#39;</span>, repeat<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>) <span style="color:#960050;background-color:#1e0010">→</span> AA AB BA BB</span></span></code></pre></div><h3 id="permutationsiterable-rnone"><code>permutations(iterable, r=None)</code><a class="anchor" href="#permutationsiterable-rnone">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>返回长度为 r 的所有排列</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>permutations(<span style="color:#e6db74">&#39;ABCD&#39;</span>, <span style="color:#ae81ff">2</span>) <span style="color:#960050;background-color:#1e0010">→</span> AB AC AD BA BC BD CA CB CD DA DB DC</span></span></code></pre></div><h3 id="combinationsiterable-r"><code>combinations(iterable, r)</code><a class="anchor" href="#combinationsiterable-r">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>返回长度为 r 的所有组合（按输入顺序）</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>combinations(<span style="color:#e6db74">&#39;ABCD&#39;</span>, <span style="color:#ae81ff">2</span>) <span style="color:#960050;background-color:#1e0010">→</span> AB AC AD BC BD CD</span></span></code></pre></div><h3 id="combinations_with_replacementiterable-r"><code>combinations_with_replacement(iterable, r)</code><a class="anchor" href="#combinations_with_replacementiterable-r">#</a></h3>
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong></p>
+<p>返回包含重复元素的组合</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>combinations_with_replacement(<span style="color:#e6db74">&#39;ABC&#39;</span>, <span style="color:#ae81ff">2</span>) <span style="color:#960050;background-color:#1e0010">→</span> AA AB AC BB BC CC</span></span></code></pre></div><h1 id=""><a class="anchor" href="#">#</a></h1>
+<h5 id=""><a class="anchor" href="#">#</a></h5>
+<p><img src="images/itertools.jpg" alt="" /></p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Introduction</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/zig/" class="flex align-center">
+        <span>Zig</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#无限迭代器">无限迭代器</a>
+      <ul>
+        <li><a href="#countstart0-step1"><code>count(start=0, step=1)</code></a></li>
+        <li><a href="#cycleiterable"><code>cycle(iterable)</code></a></li>
+        <li><a href="#repeatobject-times"><code>repeat(object[, times])</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#有限迭代器">有限迭代器</a>
+      <ul>
+        <li><a href="#accumulateiterable-func"><code>accumulate(iterable[, func])</code></a></li>
+        <li><a href="#chainiterables"><code>chain(*iterables)</code></a></li>
+        <li><a href="#chainfrom_iterableiterable"><code>chain.from_iterable(iterable)</code></a></li>
+        <li><a href="#compressdata-selectors"><code>compress(data, selectors)</code></a></li>
+        <li><a href="#dropwhilepredicate-iterable"><code>dropwhile(predicate, iterable)</code></a></li>
+        <li><a href="#filterfalsepredicate-iterable"><code>filterfalse(predicate, iterable)</code></a></li>
+        <li><a href="#groupbyiterable-keynone"><code>groupby(iterable, key=None)</code></a></li>
+        <li><a href="#isliceiterable-stop--isliceiterable-start-stop-step"><code>islice(iterable, stop)</code> / <code>islice(iterable, start, stop[, step])</code></a></li>
+        <li><a href="#starmapfunction-iterable"><code>starmap(function, iterable)</code></a></li>
+        <li><a href="#takewhilepredicate-iterable"><code>takewhile(predicate, iterable)</code></a></li>
+        <li><a href="#teeiterable-n2"><code>tee(iterable, n=2)</code></a></li>
+        <li><a href="#zip_longestiterables-fillvaluenone"><code>zip_longest(*iterables, fillvalue=None)</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#组合迭代器">组合迭代器</a>
+      <ul>
+        <li><a href="#productiterables-repeat1"><code>product(*iterables, repeat=1)</code></a></li>
+        <li><a href="#permutationsiterable-rnone"><code>permutations(iterable, r=None)</code></a></li>
+        <li><a href="#combinationsiterable-r"><code>combinations(iterable, r)</code></a></li>
+        <li><a href="#combinations_with_replacementiterable-r"><code>combinations_with_replacement(iterable, r)</code></a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
