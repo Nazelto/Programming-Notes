@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rust 生命周期#函数生命周期标识#生命周期标识省略规则#// 情况1：每个引用参数都有自己的生命周期 fn first_word(s: &amp;str) -&gt; &amp;str { // 自动推导为 fn first_word&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str let bytes = s.as_bytes(); for (i, &amp;item) in bytes.iter().enumerate() { if item == b&#39; &#39; { return &amp;s[0..i]; } } &amp;s[..] } // 情况2：如果只有一个输入生命周期，它被赋予所有输出生命周期 fn get_str(s: &amp;str) -&gt; &amp;str { // 自动推导为 fn get_str&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str s } // 情况3：如果有多个输入生命周期，但其中一个是 &amp;self 或 &amp;mut self，那么 self 的生命周期被赋予所有输出生命周期 struct StringWrapper { data: String, } impl StringWrapper { fn get_data(&amp;self) -&gt; &amp;str { // 自动推导为 fn get_data&lt;&#39;a&gt;(&amp;&#39;a self) -&gt; &amp;&#39;a str &amp;self.data } }fn print1(s: &amp;str); // elided fn print2(s: &amp;&#39;_ str); // also elided fn print3&lt;&#39;a&gt;(s: &amp;&#39;a str); // expanded fn debug1(lvl: usize, s: &amp;str); // elided fn debug2&lt;&#39;a&gt;(lvl: usize, s: &amp;&#39;a str); // expanded fn substr1(s: &amp;str, until: usize) -&gt; &amp;str; // elided fn substr2&lt;&#39;a&gt;(s: &amp;&#39;a str, until: usize) -&gt; &amp;&#39;a str; // expanded fn get_mut1(&amp;mut self) -&gt; &amp;mut dyn T; // elided fn get_mut2&lt;&#39;a&gt;(&amp;&#39;a mut self) -&gt; &amp;&#39;a mut dyn T; // expanded fn args1&lt;T: ToCStr&gt;(&amp;mut self, args: &amp;[T]) -&gt; &amp;mut Command; // elided fn args2&lt;&#39;a, &#39;b, T: ToCStr&gt;(&amp;&#39;a mut self, args: &amp;&#39;b [T]) -&gt; &amp;&#39;a mut Command; // expanded fn other_args1&lt;&#39;a&gt;(arg: &amp;str) -&gt; &amp;&#39;a str; // elided fn other_args2&lt;&#39;a, &#39;b&gt;(arg: &amp;&#39;b str) -&gt; &amp;&#39;a str; // expanded fn new1(buf: &amp;mut [u8]) -&gt; Thing&lt;&#39;_&gt;; // elided - preferred fn new2(buf: &amp;mut [u8]) -&gt; Thing; // elided fn new3&lt;&#39;a&gt;(buf: &amp;&#39;a mut [u8]) -&gt; Thing&lt;&#39;a&gt;; // expanded type FunPtr1 = fn(&amp;str) -&gt; &amp;str; // elided type FunPtr2 = for&lt;&#39;a&gt; fn(&amp;&#39;a str) -&gt; &amp;&#39;a str; // expanded type FunTrait1 = dyn Fn(&amp;str) -&gt; &amp;str; // elided type FunTrait2 = dyn for&lt;&#39;a&gt; Fn(&amp;&#39;a str) -&gt; &amp;&#39;a str; // expanded 生命周期变异性#fn assign&lt;T&gt;(input: &amp;mut T, val: T) { *input = val; } fn main() { let mut hello: &amp;&#39;static str = &#34;hello&#34;; { let world = String::from(&#34;world&#34;); assign(&amp;mut hello, &amp;world); } println!(&#34;{hello}&#34;); // 使用在被释放后的值 😿 } TIP
+协变(covariant)、不变(invariant)、逆变(contravariant)
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/rust/lifetime/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="Rust 生命周期#函数生命周期标识#生命周期标识省略规则#// 情况1：每个引用参数都有自己的生命周期 fn first_word(s: &amp;str) -&gt; &amp;str { // 自动推导为 fn first_word&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str let bytes = s.as_bytes(); for (i, &amp;item) in bytes.iter().enumerate() { if item == b&#39; &#39; { return &amp;s[0..i]; } } &amp;s[..] } // 情况2：如果只有一个输入生命周期，它被赋予所有输出生命周期 fn get_str(s: &amp;str) -&gt; &amp;str { // 自动推导为 fn get_str&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str s } // 情况3：如果有多个输入生命周期，但其中一个是 &amp;self 或 &amp;mut self，那么 self 的生命周期被赋予所有输出生命周期 struct StringWrapper { data: String, } impl StringWrapper { fn get_data(&amp;self) -&gt; &amp;str { // 自动推导为 fn get_data&lt;&#39;a&gt;(&amp;&#39;a self) -&gt; &amp;&#39;a str &amp;self.data } }fn print1(s: &amp;str); // elided fn print2(s: &amp;&#39;_ str); // also elided fn print3&lt;&#39;a&gt;(s: &amp;&#39;a str); // expanded fn debug1(lvl: usize, s: &amp;str); // elided fn debug2&lt;&#39;a&gt;(lvl: usize, s: &amp;&#39;a str); // expanded fn substr1(s: &amp;str, until: usize) -&gt; &amp;str; // elided fn substr2&lt;&#39;a&gt;(s: &amp;&#39;a str, until: usize) -&gt; &amp;&#39;a str; // expanded fn get_mut1(&amp;mut self) -&gt; &amp;mut dyn T; // elided fn get_mut2&lt;&#39;a&gt;(&amp;&#39;a mut self) -&gt; &amp;&#39;a mut dyn T; // expanded fn args1&lt;T: ToCStr&gt;(&amp;mut self, args: &amp;[T]) -&gt; &amp;mut Command; // elided fn args2&lt;&#39;a, &#39;b, T: ToCStr&gt;(&amp;&#39;a mut self, args: &amp;&#39;b [T]) -&gt; &amp;&#39;a mut Command; // expanded fn other_args1&lt;&#39;a&gt;(arg: &amp;str) -&gt; &amp;&#39;a str; // elided fn other_args2&lt;&#39;a, &#39;b&gt;(arg: &amp;&#39;b str) -&gt; &amp;&#39;a str; // expanded fn new1(buf: &amp;mut [u8]) -&gt; Thing&lt;&#39;_&gt;; // elided - preferred fn new2(buf: &amp;mut [u8]) -&gt; Thing; // elided fn new3&lt;&#39;a&gt;(buf: &amp;&#39;a mut [u8]) -&gt; Thing&lt;&#39;a&gt;; // expanded type FunPtr1 = fn(&amp;str) -&gt; &amp;str; // elided type FunPtr2 = for&lt;&#39;a&gt; fn(&amp;&#39;a str) -&gt; &amp;&#39;a str; // expanded type FunTrait1 = dyn Fn(&amp;str) -&gt; &amp;str; // elided type FunTrait2 = dyn for&lt;&#39;a&gt; Fn(&amp;&#39;a str) -&gt; &amp;&#39;a str; // expanded 生命周期变异性#fn assign&lt;T&gt;(input: &amp;mut T, val: T) { *input = val; } fn main() { let mut hello: &amp;&#39;static str = &#34;hello&#34;; { let world = String::from(&#34;world&#34;); assign(&amp;mut hello, &amp;world); } println!(&#34;{hello}&#34;); // 使用在被释放后的值 😿 } TIP
+协变(covariant)、不变(invariant)、逆变(contravariant)">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="Rust 生命周期#函数生命周期标识#生命周期标识省略规则#// 情况1：每个引用参数都有自己的生命周期 fn first_word(s: &amp;str) -&gt; &amp;str { // 自动推导为 fn first_word&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str let bytes = s.as_bytes(); for (i, &amp;item) in bytes.iter().enumerate() { if item == b&#39; &#39; { return &amp;s[0..i]; } } &amp;s[..] } // 情况2：如果只有一个输入生命周期，它被赋予所有输出生命周期 fn get_str(s: &amp;str) -&gt; &amp;str { // 自动推导为 fn get_str&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str s } // 情况3：如果有多个输入生命周期，但其中一个是 &amp;self 或 &amp;mut self，那么 self 的生命周期被赋予所有输出生命周期 struct StringWrapper { data: String, } impl StringWrapper { fn get_data(&amp;self) -&gt; &amp;str { // 自动推导为 fn get_data&lt;&#39;a&gt;(&amp;&#39;a self) -&gt; &amp;&#39;a str &amp;self.data } }fn print1(s: &amp;str); // elided fn print2(s: &amp;&#39;_ str); // also elided fn print3&lt;&#39;a&gt;(s: &amp;&#39;a str); // expanded fn debug1(lvl: usize, s: &amp;str); // elided fn debug2&lt;&#39;a&gt;(lvl: usize, s: &amp;&#39;a str); // expanded fn substr1(s: &amp;str, until: usize) -&gt; &amp;str; // elided fn substr2&lt;&#39;a&gt;(s: &amp;&#39;a str, until: usize) -&gt; &amp;&#39;a str; // expanded fn get_mut1(&amp;mut self) -&gt; &amp;mut dyn T; // elided fn get_mut2&lt;&#39;a&gt;(&amp;&#39;a mut self) -&gt; &amp;&#39;a mut dyn T; // expanded fn args1&lt;T: ToCStr&gt;(&amp;mut self, args: &amp;[T]) -&gt; &amp;mut Command; // elided fn args2&lt;&#39;a, &#39;b, T: ToCStr&gt;(&amp;&#39;a mut self, args: &amp;&#39;b [T]) -&gt; &amp;&#39;a mut Command; // expanded fn other_args1&lt;&#39;a&gt;(arg: &amp;str) -&gt; &amp;&#39;a str; // elided fn other_args2&lt;&#39;a, &#39;b&gt;(arg: &amp;&#39;b str) -&gt; &amp;&#39;a str; // expanded fn new1(buf: &amp;mut [u8]) -&gt; Thing&lt;&#39;_&gt;; // elided - preferred fn new2(buf: &amp;mut [u8]) -&gt; Thing; // elided fn new3&lt;&#39;a&gt;(buf: &amp;&#39;a mut [u8]) -&gt; Thing&lt;&#39;a&gt;; // expanded type FunPtr1 = fn(&amp;str) -&gt; &amp;str; // elided type FunPtr2 = for&lt;&#39;a&gt; fn(&amp;&#39;a str) -&gt; &amp;&#39;a str; // expanded type FunTrait1 = dyn Fn(&amp;str) -&gt; &amp;str; // elided type FunTrait2 = dyn for&lt;&#39;a&gt; Fn(&amp;&#39;a str) -&gt; &amp;&#39;a str; // expanded 生命周期变异性#fn assign&lt;T&gt;(input: &amp;mut T, val: T) { *input = val; } fn main() { let mut hello: &amp;&#39;static str = &#34;hello&#34;; { let world = String::from(&#34;world&#34;); assign(&amp;mut hello, &amp;world); } println!(&#34;{hello}&#34;); // 使用在被释放后的值 😿 } TIP
+协变(covariant)、不变(invariant)、逆变(contravariant)">
+  <meta itemprop="wordCount" content="450">
+
+<title>Lifetime | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/rust/lifetime/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.8ccbe672c1bf35d82b22b6346ff683de6802370d84ba4bd98b61a56c86f51b01.js" integrity="sha256-jMvmcsG/NdgrIrY0b/aD3mgCNw2EukvZi2GlbIb1GwE=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle" checked />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="active">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Lifetime</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#函数生命周期标识"><strong>函数生命周期标识</strong></a>
+      <ul>
+        <li><a href="#生命周期标识省略规则"><strong>生命周期标识省略规则</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#生命周期变异性"><strong>生命周期变异性</strong></a></li>
+    <li><a href="#重借用reborrow"><strong>重借用(ReBorrow)</strong></a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="rust-生命周期"><strong>Rust 生命周期</strong><a class="anchor" href="#rust-%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f">#</a></h1>
+<h2 id="函数生命周期标识"><strong>函数生命周期标识</strong><a class="anchor" href="#%e5%87%bd%e6%95%b0%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e6%a0%87%e8%af%86">#</a></h2>
+<h3 id="生命周期标识省略规则"><strong>生命周期标识省略规则</strong><a class="anchor" href="#%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e6%a0%87%e8%af%86%e7%9c%81%e7%95%a5%e8%a7%84%e5%88%99">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// 情况1：每个引用参数都有自己的生命周期
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">first_word</span>(s: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span> {  <span style="color:#75715e">// 自动推导为 fn first_word&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> bytes <span style="color:#f92672">=</span> s.as_bytes();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (i, <span style="color:#f92672">&amp;</span>item) <span style="color:#66d9ef">in</span> bytes.iter().enumerate() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> item <span style="color:#f92672">==</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39; &#39;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span>s[<span style="color:#ae81ff">0</span><span style="color:#f92672">..</span>i];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&amp;</span>s[<span style="color:#f92672">..</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 情况2：如果只有一个输入生命周期，它被赋予所有输出生命周期
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_str</span>(s: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span> {  <span style="color:#75715e">// 自动推导为 fn get_str&lt;&#39;a&gt;(s: &amp;&#39;a str) -&gt; &amp;&#39;a str
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    s
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 情况3：如果有多个输入生命周期，但其中一个是 &amp;self 或 &amp;mut self，那么 self 的生命周期被赋予所有输出生命周期
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">StringWrapper</span> {
+</span></span><span style="display:flex;"><span>    data: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> StringWrapper {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_data</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span> {  <span style="color:#75715e">// 自动推导为 fn get_data&lt;&#39;a&gt;(&amp;&#39;a self) -&gt; &amp;&#39;a str
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">&amp;</span>self.data
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">print1</span>(s: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>);                                   <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">print2</span>(s: <span style="color:#66d9ef">&amp;</span>&#39;_ <span style="color:#66d9ef">str</span>);                                <span style="color:#75715e">// also elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">print3</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>(s: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>);                            <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">debug1</span>(lvl: <span style="color:#66d9ef">usize</span>, s: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>);                       <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">debug2</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>(lvl: <span style="color:#66d9ef">usize</span>, s: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>);                <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">substr1</span>(s: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>, until: <span style="color:#66d9ef">usize</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>;            <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">substr2</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>(s: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>, until: <span style="color:#66d9ef">usize</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>;  <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_mut1</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> <span style="color:#66d9ef">dyn</span> T;                 <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_mut2</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">mut</span> self) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">mut</span> <span style="color:#66d9ef">dyn</span> T;       <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">args1</span><span style="color:#f92672">&lt;</span>T: <span style="color:#a6e22e">ToCStr</span><span style="color:#f92672">&gt;</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, args: <span style="color:#66d9ef">&amp;</span>[T]) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> Command;                  <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">args2</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, <span style="color:#a6e22e">&#39;b</span>, T: <span style="color:#a6e22e">ToCStr</span><span style="color:#f92672">&gt;</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">mut</span> self, args: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;b</span> [T]) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">mut</span> Command; <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">other_args1</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>(arg: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>;             <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">other_args2</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, <span style="color:#a6e22e">&#39;b</span><span style="color:#f92672">&gt;</span>(arg: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;b</span> <span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>;      <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new1</span>(buf: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> [<span style="color:#66d9ef">u8</span>]) -&gt; <span style="color:#a6e22e">Thing</span><span style="color:#f92672">&lt;</span>&#39;_<span style="color:#f92672">&gt;</span>;                 <span style="color:#75715e">// elided - preferred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new2</span>(buf: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> [<span style="color:#66d9ef">u8</span>]) -&gt; <span style="color:#a6e22e">Thing</span>;                     <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new3</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>(buf: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">mut</span> [<span style="color:#66d9ef">u8</span>]) -&gt; <span style="color:#a6e22e">Thing</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span>;          <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">FunPtr1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">fn</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>;                      <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">FunPtr2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">for</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">fn</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>;        <span style="color:#75715e">// expanded
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">FunTrait1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">dyn</span> Fn(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>;                <span style="color:#75715e">// elided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">FunTrait2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">dyn</span> <span style="color:#66d9ef">for</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span><span style="color:#f92672">&gt;</span> Fn(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">str</span>;  <span style="color:#75715e">// expanded
+</span></span></span></code></pre></div><hr>
+<h2 id="生命周期变异性"><strong>生命周期变异性</strong><a class="anchor" href="#%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e5%8f%98%e5%bc%82%e6%80%a7">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">assign</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(input: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> T, val: <span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>input <span style="color:#f92672">=</span> val;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> hello: <span style="color:#66d9ef">&amp;</span>&#39;static <span style="color:#66d9ef">str</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hello&#34;</span>;
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> world <span style="color:#f92672">=</span> String::from(<span style="color:#e6db74">&#34;world&#34;</span>);
+</span></span><span style="display:flex;"><span>        assign(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> hello, <span style="color:#f92672">&amp;</span>world);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{hello}</span><span style="color:#e6db74">&#34;</span>); <span style="color:#75715e">// 使用在被释放后的值 😿
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}</span></span></code></pre></div><!-- raw HTML omitted -->
+<blockquote class='book-hint tip'>
+<p><strong>TIP</strong><br>
+协变(covariant)、不变(invariant)、逆变(contravariant)</p>
+<p>协变(covariant)：<br>
+如果<code>T</code>是协变的且<code>U是T的子类型</code>，那么<code>container&lt;T&gt;</code>的子类型是<code>container&lt;U&gt;</code>。</p>
+<p>逆变(contravariant)：<br>
+如果<code>T</code>是逆变的且<code>U是T的子类型</code>，那么<code>container&lt;U&gt;</code>的子类型是<code>container&lt;T&gt;</code>。</p>
+<p>不变(invariant)：<br>
+两者没有任何关系。</p></blockquote><table>
+  <thead>
+      <tr>
+          <th style="text-align: center"></th>
+          <th style="text-align: center">&lsquo;a</th>
+          <th style="text-align: center">T</th>
+          <th style="text-align: center">U</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><code>&amp;'a T</code></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>&amp;'a mut T</code></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center">invariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>*const T</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>*mut T</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">invariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>Box&lt;T&gt;</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>Vec&lt;T&gt;</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>UnsafeCell&lt;T&gt;</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">invariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>Cell&lt;T&gt;</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">invariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>fn(T) -&gt; U</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center">contravariant</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>[T]</code>和<code>[T;n]</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>std::marker::PhantomData&lt;T&gt;</code></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+      <tr>
+          <td style="text-align: center"><code>dyn Trait&lt;T&gt; + 'a</code></td>
+          <td style="text-align: center">covariant</td>
+          <td style="text-align: center">invariant</td>
+          <td style="text-align: center"></td>
+      </tr>
+  </tbody>
+</table>
+<!-- raw HTML omitted -->
+<blockquote class='book-hint note'>
+<p><strong>NOTE</strong><br>
+<code>&amp;'a mut T</code>中关于T为什么是不变(invariant)的。如果是协变的那么当缩减了生命周期后就会出现悬垂指针。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">assign_short_string</span>(x: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;short</span> <span style="color:#66d9ef">str</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> s <span style="color:#f92672">=</span> String::from(<span style="color:#e6db74">&#34;short&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>x <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>s; <span style="color:#75715e">// 将短生命周期的字符串赋值给 *x
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} <span style="color:#75715e">// s 被丢弃，所以 *x 变成了悬垂指针
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> static_str: <span style="color:#66d9ef">&amp;</span>&#39;static <span style="color:#66d9ef">str</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hello&#34;</span>;
+</span></span><span style="display:flex;"><span>    assign_short_string(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> static_str); <span style="color:#75715e">// 如果允许，那么 static_str 会指向一个已释放的字符串
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, static_str); <span style="color:#75715e">// 使用悬垂指针
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} 
+</span></span></code></pre></div></blockquote><!-- raw HTML omitted -->
+<hr>
+<h2 id="重借用reborrow"><strong>重借用(ReBorrow)</strong><a class="anchor" href="#%e9%87%8d%e5%80%9f%e7%94%a8reborrow">#</a></h2>
+<blockquote class='book-hint tip'>
+<p><strong>TIP</strong><br>
+<code>&amp;'a T</code> 实现了<code>Copy trait</code>， <code>&amp;'a mut T</code> 没有实现<code>Copy trait</code>。</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">42</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> x:<span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> i;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> y:<span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> x; <span style="color:#75715e">// 等价于 let y:&amp;mut i32 = &amp;mut *x;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// y 重借用了i, 在y存活时期不可以使用x与i。
+</span></span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Rust Crate</span>
+      </a>
+    
+    </span>
+    <span>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#函数生命周期标识"><strong>函数生命周期标识</strong></a>
+      <ul>
+        <li><a href="#生命周期标识省略规则"><strong>生命周期标识省略规则</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#生命周期变异性"><strong>生命周期变异性</strong></a></li>
+    <li><a href="#重借用reborrow"><strong>重借用(ReBorrow)</strong></a></li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

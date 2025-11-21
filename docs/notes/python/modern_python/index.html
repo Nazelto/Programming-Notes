@@ -32,7 +32,7 @@ https://github.com/alex-shpak/hugo-book
 装饰器也是函数。
 被装饰器修饰的函数将会在装饰器内部执行。
 自定义装饰器#from typing import Callable,Any from time import perf_counter,sleep # 计时装饰器 def time(func:Callable) -&gt; Callable: def wrapper(*args,**kargs) -&gt; Any: print(f&#39;Timing &#34;{func.__name__}&#34;...&#39;) start:float = perf_counter() result:Any = func(*args,**kargs) end:float = perf_counter() print(f&#39;&#34;{func.__name__}&#34; took: {end - start: .4f}s&#39;) return result return wrapper # 函数式写法 def time(func:Callable) -&gt; Callable: @wraps(func) def wrapper(*args,**kargs) -&gt; Any:上下文#with 语法 使用提供的上下文 (@cotextmanager)#python 的builtin库 内置的contextlib中contextmanager装饰器可以将生成器变为具有上下文的函数。">
-  <meta itemprop="wordCount" content="188">
+  <meta itemprop="wordCount" content="189">
 
 <title>Modern Python | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
@@ -42,7 +42,7 @@ https://github.com/alex-shpak/hugo-book
 
 
   <script defer src="/Programming-Notes/fuse.min.js"></script>
-  <script defer src="/Programming-Notes/en.search.min.d3b610121920a2c76e534a2cc12481102d483e305b21e02523912b566339f3c8.js" integrity="sha256-07YQEhkgosduU0oswSSBEC1IPjBbIeAlI5ErVmM588g=" crossorigin="anonymous"></script>
+  <script defer src="/Programming-Notes/en.search.min.8ccbe672c1bf35d82b22b6346ff683de6802370d84ba4bd98b61a56c86f51b01.js" integrity="sha256-jMvmcsG/NdgrIrY0b/aD3mgCNw2EukvZi2GlbIb1GwE=" crossorigin="anonymous"></script>
 
 
 
@@ -231,6 +231,20 @@ https://github.com/alex-shpak/hugo-book
         </li>
       
     
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
   </ul>
 
         </li>
@@ -394,7 +408,8 @@ https://github.com/alex-shpak/hugo-book
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Type</span>(Enum):
 </span></span><span style="display:flex;"><span>    Some <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span></span></span></code></pre></div><h3 id="实例方法类方法静态方法">实例方法·类方法·静态方法<a class="anchor" href="#%e5%ae%9e%e4%be%8b%e6%96%b9%e6%b3%95%e7%b1%bb%e6%96%b9%e6%b3%95%e9%9d%99%e6%80%81%e6%96%b9%e6%b3%95">#</a></h3>
 <blockquote class='book-hint tip'>
-<p>类方法是针对类的，实例方法是针对实例的，静态方法是针对类和实例的。<br>
+<p><strong>TIP</strong><br>
+类方法是针对类的，实例方法是针对实例的，静态方法是针对类和实例的。<br>
 类方法常用于提供额外的构造对象的方式，作为__init__方法的补充。</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 静态方法</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">@staticmethod</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># 类方法</span>
