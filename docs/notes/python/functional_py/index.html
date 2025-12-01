@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Pytoolz#A functional standard library for Python.
+核心模块#Itertoolz - 迭代工具#处理序列和迭代器的函数：
+函数 说明 accumulate(binop, seq[, initial]) 对序列重复应用二元函数，累积结果 concat(seqs) 连接零个或多个可迭代对象 concatv(*seqs) concat的可变参数版本 cons(el, seq) 将元素添加到序列开头 count(seq) 计算序列中的项数 drop(n, seq) 返回跳过前n个元素后的序列 first(seq) 序列的第一个元素 frequencies(seq) 找出序列中每个值出现的次数 get(ind, seq[, default]) 获取序列或字典中的元素 groupby(key, seq) 按键函数对集合进行分组 interleave(seqs) 交错一个序列的序列 interpose(el, seq) 在序列的每对元素之间引入元素 isdistinct(seq) 检查序列中的所有值是否不同 isiterable(x) 检查x是否可迭代 iterate(func, x) 重复对原始输入应用函数 join(leftkey, leftseq, rightkey, rightseq[, ...]) 在公共属性上连接两个序列 last(seq) 序列的最后一个元素 mapcat(func, seqs) 对seqs中的每个序列应用func，连接结果 merge_sorted(*seqs, **kwargs) 合并和排序已排序集合的集合 nth(n, seq) 序列的第n个元素 partition(n, seq[, pad]) 将序列分区为长度为n的元组 partition_all(n, seq) 将所有元素分区为最多n个元素的元组 peek(seq) 检索序列的下一个元素 peekn(n, seq) 检索序列的下n个元素 pluck(ind, seqs[, default]) 从序列中的每个项提取一个或多个元素 random_sample(prob, seq[, random_state]) 以概率prob从序列返回元素 reduceby(key, binop, seq[, init]) 执行同时的groupby和reduction remove(predicate, seq) 返回predicate(item)为False的序列项 second(seq) 序列的第二个元素 sliding_window(n, seq) 重叠子序列的序列 tail(n, seq) 序列的最后n个元素 take(n, seq) 序列的前n个元素 take_nth(n, seq) seq中的每第n个项 topk(k, seq[, key]) 找出序列的k个最大元素 unique(seq[, key]) 仅返回序列的唯一元素 Functoolz - 函数工具#函数组合和操作：
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/python/functional_py/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="Pytoolz#A functional standard library for Python.
+核心模块#Itertoolz - 迭代工具#处理序列和迭代器的函数：
+函数 说明 accumulate(binop, seq[, initial]) 对序列重复应用二元函数，累积结果 concat(seqs) 连接零个或多个可迭代对象 concatv(*seqs) concat的可变参数版本 cons(el, seq) 将元素添加到序列开头 count(seq) 计算序列中的项数 drop(n, seq) 返回跳过前n个元素后的序列 first(seq) 序列的第一个元素 frequencies(seq) 找出序列中每个值出现的次数 get(ind, seq[, default]) 获取序列或字典中的元素 groupby(key, seq) 按键函数对集合进行分组 interleave(seqs) 交错一个序列的序列 interpose(el, seq) 在序列的每对元素之间引入元素 isdistinct(seq) 检查序列中的所有值是否不同 isiterable(x) 检查x是否可迭代 iterate(func, x) 重复对原始输入应用函数 join(leftkey, leftseq, rightkey, rightseq[, ...]) 在公共属性上连接两个序列 last(seq) 序列的最后一个元素 mapcat(func, seqs) 对seqs中的每个序列应用func，连接结果 merge_sorted(*seqs, **kwargs) 合并和排序已排序集合的集合 nth(n, seq) 序列的第n个元素 partition(n, seq[, pad]) 将序列分区为长度为n的元组 partition_all(n, seq) 将所有元素分区为最多n个元素的元组 peek(seq) 检索序列的下一个元素 peekn(n, seq) 检索序列的下n个元素 pluck(ind, seqs[, default]) 从序列中的每个项提取一个或多个元素 random_sample(prob, seq[, random_state]) 以概率prob从序列返回元素 reduceby(key, binop, seq[, init]) 执行同时的groupby和reduction remove(predicate, seq) 返回predicate(item)为False的序列项 second(seq) 序列的第二个元素 sliding_window(n, seq) 重叠子序列的序列 tail(n, seq) 序列的最后n个元素 take(n, seq) 序列的前n个元素 take_nth(n, seq) seq中的每第n个项 topk(k, seq[, key]) 找出序列的k个最大元素 unique(seq[, key]) 仅返回序列的唯一元素 Functoolz - 函数工具#函数组合和操作：">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="Pytoolz#A functional standard library for Python.
+核心模块#Itertoolz - 迭代工具#处理序列和迭代器的函数：
+函数 说明 accumulate(binop, seq[, initial]) 对序列重复应用二元函数，累积结果 concat(seqs) 连接零个或多个可迭代对象 concatv(*seqs) concat的可变参数版本 cons(el, seq) 将元素添加到序列开头 count(seq) 计算序列中的项数 drop(n, seq) 返回跳过前n个元素后的序列 first(seq) 序列的第一个元素 frequencies(seq) 找出序列中每个值出现的次数 get(ind, seq[, default]) 获取序列或字典中的元素 groupby(key, seq) 按键函数对集合进行分组 interleave(seqs) 交错一个序列的序列 interpose(el, seq) 在序列的每对元素之间引入元素 isdistinct(seq) 检查序列中的所有值是否不同 isiterable(x) 检查x是否可迭代 iterate(func, x) 重复对原始输入应用函数 join(leftkey, leftseq, rightkey, rightseq[, ...]) 在公共属性上连接两个序列 last(seq) 序列的最后一个元素 mapcat(func, seqs) 对seqs中的每个序列应用func，连接结果 merge_sorted(*seqs, **kwargs) 合并和排序已排序集合的集合 nth(n, seq) 序列的第n个元素 partition(n, seq[, pad]) 将序列分区为长度为n的元组 partition_all(n, seq) 将所有元素分区为最多n个元素的元组 peek(seq) 检索序列的下一个元素 peekn(n, seq) 检索序列的下n个元素 pluck(ind, seqs[, default]) 从序列中的每个项提取一个或多个元素 random_sample(prob, seq[, random_state]) 以概率prob从序列返回元素 reduceby(key, binop, seq[, init]) 执行同时的groupby和reduction remove(predicate, seq) 返回predicate(item)为False的序列项 second(seq) 序列的第二个元素 sliding_window(n, seq) 重叠子序列的序列 tail(n, seq) 序列的最后n个元素 take(n, seq) 序列的前n个元素 take_nth(n, seq) seq中的每第n个项 topk(k, seq[, key]) 找出序列的k个最大元素 unique(seq[, key]) 仅返回序列的唯一元素 Functoolz - 函数工具#函数组合和操作：">
+  <meta itemprop="wordCount" content="885">
+
+<title>Functional Py | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/python/functional_py/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.e1dbcd32ffed9e37da83b378e0d0f720f5043b9723e423834661f33c9bc71f82.js" integrity="sha256-4dvNMv/tnjfag7N44ND3IPUEO5cj5CODRmHzPJvHH4I=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle" checked />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="active">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Functional Py</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#核心模块">核心模块</a>
+      <ul>
+        <li><a href="#itertoolz---迭代工具">Itertoolz - 迭代工具</a></li>
+        <li><a href="#functoolz---函数工具">Functoolz - 函数工具</a></li>
+        <li><a href="#dicttoolz---字典工具">Dicttoolz - 字典工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#基本使用示例">基本使用示例</a>
+      <ul>
+        <li><a href="#常用函数-excepts">常用函数 excepts</a></li>
+      </ul>
+    </li>
+    <li><a href="#functoolz-详细示例">Functoolz 详细示例</a>
+      <ul>
+        <li><a href="#apply---应用函数">apply - 应用函数</a></li>
+        <li><a href="#complement---逻辑补集">complement - 逻辑补集</a></li>
+        <li><a href="#compose---函数组合从右到左">compose - 函数组合（从右到左）</a></li>
+        <li><a href="#compose_left---函数组合从左到右">compose_left - 函数组合（从左到右）</a></li>
+        <li><a href="#curry---柯里化">curry - 柯里化</a></li>
+        <li><a href="#do---执行函数并返回原值">do - 执行函数并返回原值</a></li>
+        <li><a href="#flip---翻转参数">flip - 翻转参数</a></li>
+        <li><a href="#identity---恒等函数">identity - 恒等函数</a></li>
+        <li><a href="#juxt---并行调用多个函数">juxt - 并行调用多个函数</a></li>
+        <li><a href="#memoize---函数缓存">memoize - 函数缓存</a></li>
+        <li><a href="#pipe---管道">pipe - 管道</a></li>
+        <li><a href="#thread_first---线程优先">thread_first - 线程优先</a></li>
+        <li><a href="#thread_last---线程最后">thread_last - 线程最后</a></li>
+      </ul>
+    </li>
+    <li><a href="#实战组合示例">实战组合示例</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="pytoolz">Pytoolz<a class="anchor" href="#pytoolz">#</a></h1>
+<p>A functional standard library for Python.</p>
+<h2 id="核心模块">核心模块<a class="anchor" href="#%e6%a0%b8%e5%bf%83%e6%a8%a1%e5%9d%97">#</a></h2>
+<h3 id="itertoolz---迭代工具">Itertoolz - 迭代工具<a class="anchor" href="#itertoolz---%e8%bf%ad%e4%bb%a3%e5%b7%a5%e5%85%b7">#</a></h3>
+<p>处理序列和迭代器的函数：</p>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>accumulate(binop, seq[, initial])</code></td>
+          <td>对序列重复应用二元函数，累积结果</td>
+      </tr>
+      <tr>
+          <td><code>concat(seqs)</code></td>
+          <td>连接零个或多个可迭代对象</td>
+      </tr>
+      <tr>
+          <td><code>concatv(*seqs)</code></td>
+          <td>concat的可变参数版本</td>
+      </tr>
+      <tr>
+          <td><code>cons(el, seq)</code></td>
+          <td>将元素添加到序列开头</td>
+      </tr>
+      <tr>
+          <td><code>count(seq)</code></td>
+          <td>计算序列中的项数</td>
+      </tr>
+      <tr>
+          <td><code>drop(n, seq)</code></td>
+          <td>返回跳过前n个元素后的序列</td>
+      </tr>
+      <tr>
+          <td><code>first(seq)</code></td>
+          <td>序列的第一个元素</td>
+      </tr>
+      <tr>
+          <td><code>frequencies(seq)</code></td>
+          <td>找出序列中每个值出现的次数</td>
+      </tr>
+      <tr>
+          <td><code>get(ind, seq[, default])</code></td>
+          <td>获取序列或字典中的元素</td>
+      </tr>
+      <tr>
+          <td><code>groupby(key, seq)</code></td>
+          <td>按键函数对集合进行分组</td>
+      </tr>
+      <tr>
+          <td><code>interleave(seqs)</code></td>
+          <td>交错一个序列的序列</td>
+      </tr>
+      <tr>
+          <td><code>interpose(el, seq)</code></td>
+          <td>在序列的每对元素之间引入元素</td>
+      </tr>
+      <tr>
+          <td><code>isdistinct(seq)</code></td>
+          <td>检查序列中的所有值是否不同</td>
+      </tr>
+      <tr>
+          <td><code>isiterable(x)</code></td>
+          <td>检查x是否可迭代</td>
+      </tr>
+      <tr>
+          <td><code>iterate(func, x)</code></td>
+          <td>重复对原始输入应用函数</td>
+      </tr>
+      <tr>
+          <td><code>join(leftkey, leftseq, rightkey, rightseq[, ...])</code></td>
+          <td>在公共属性上连接两个序列</td>
+      </tr>
+      <tr>
+          <td><code>last(seq)</code></td>
+          <td>序列的最后一个元素</td>
+      </tr>
+      <tr>
+          <td><code>mapcat(func, seqs)</code></td>
+          <td>对seqs中的每个序列应用func，连接结果</td>
+      </tr>
+      <tr>
+          <td><code>merge_sorted(*seqs, **kwargs)</code></td>
+          <td>合并和排序已排序集合的集合</td>
+      </tr>
+      <tr>
+          <td><code>nth(n, seq)</code></td>
+          <td>序列的第n个元素</td>
+      </tr>
+      <tr>
+          <td><code>partition(n, seq[, pad])</code></td>
+          <td>将序列分区为长度为n的元组</td>
+      </tr>
+      <tr>
+          <td><code>partition_all(n, seq)</code></td>
+          <td>将所有元素分区为最多n个元素的元组</td>
+      </tr>
+      <tr>
+          <td><code>peek(seq)</code></td>
+          <td>检索序列的下一个元素</td>
+      </tr>
+      <tr>
+          <td><code>peekn(n, seq)</code></td>
+          <td>检索序列的下n个元素</td>
+      </tr>
+      <tr>
+          <td><code>pluck(ind, seqs[, default])</code></td>
+          <td>从序列中的每个项提取一个或多个元素</td>
+      </tr>
+      <tr>
+          <td><code>random_sample(prob, seq[, random_state])</code></td>
+          <td>以概率prob从序列返回元素</td>
+      </tr>
+      <tr>
+          <td><code>reduceby(key, binop, seq[, init])</code></td>
+          <td>执行同时的groupby和reduction</td>
+      </tr>
+      <tr>
+          <td><code>remove(predicate, seq)</code></td>
+          <td>返回predicate(item)为False的序列项</td>
+      </tr>
+      <tr>
+          <td><code>second(seq)</code></td>
+          <td>序列的第二个元素</td>
+      </tr>
+      <tr>
+          <td><code>sliding_window(n, seq)</code></td>
+          <td>重叠子序列的序列</td>
+      </tr>
+      <tr>
+          <td><code>tail(n, seq)</code></td>
+          <td>序列的最后n个元素</td>
+      </tr>
+      <tr>
+          <td><code>take(n, seq)</code></td>
+          <td>序列的前n个元素</td>
+      </tr>
+      <tr>
+          <td><code>take_nth(n, seq)</code></td>
+          <td>seq中的每第n个项</td>
+      </tr>
+      <tr>
+          <td><code>topk(k, seq[, key])</code></td>
+          <td>找出序列的k个最大元素</td>
+      </tr>
+      <tr>
+          <td><code>unique(seq[, key])</code></td>
+          <td>仅返回序列的唯一元素</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="functoolz---函数工具">Functoolz - 函数工具<a class="anchor" href="#functoolz---%e5%87%bd%e6%95%b0%e5%b7%a5%e5%85%b7">#</a></h3>
+<p>函数组合和操作：</p>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>apply(*func_and_args, **kwargs)</code></td>
+          <td>应用函数并返回结果</td>
+      </tr>
+      <tr>
+          <td><code>complement(func)</code></td>
+          <td>将谓词函数转换为其逻辑补集</td>
+      </tr>
+      <tr>
+          <td><code>compose(*funcs)</code></td>
+          <td>组合函数以串联操作</td>
+      </tr>
+      <tr>
+          <td><code>compose_left(*funcs)</code></td>
+          <td>从左到右组合函数</td>
+      </tr>
+      <tr>
+          <td><code>curry(*args, **kwargs)</code></td>
+          <td>对可调用函数进行柯里化</td>
+      </tr>
+      <tr>
+          <td><code>do(func, x)</code></td>
+          <td>在x上运行func，返回x</td>
+      </tr>
+      <tr>
+          <td><code>excepts(exc, func[, handler])</code></td>
+          <td>捕获异常并分派到处理程序的包装器</td>
+      </tr>
+      <tr>
+          <td><code>flip([func, a, b])</code></td>
+          <td>调用函数时翻转参数</td>
+      </tr>
+      <tr>
+          <td><code>identity(x)</code></td>
+          <td>恒等函数</td>
+      </tr>
+      <tr>
+          <td><code>juxt(*funcs)</code></td>
+          <td>创建一个用相同参数调用多个函数的函数</td>
+      </tr>
+      <tr>
+          <td><code>memoize([func, cache, key])</code></td>
+          <td>缓存函数结果以加快未来评估</td>
+      </tr>
+      <tr>
+          <td><code>pipe(data, *funcs)</code></td>
+          <td>通过一系列函数管道传递值</td>
+      </tr>
+      <tr>
+          <td><code>thread_first(val, *forms)</code></td>
+          <td>通过一系列函数/形式线程化值</td>
+      </tr>
+      <tr>
+          <td><code>thread_last(val, *forms)</code></td>
+          <td>通过一系列函数/形式线程化值</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="dicttoolz---字典工具">Dicttoolz - 字典工具<a class="anchor" href="#dicttoolz---%e5%ad%97%e5%85%b8%e5%b7%a5%e5%85%b7">#</a></h3>
+<p>字典操作函数：</p>
+<table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>assoc(d, key, value[, factory])</code></td>
+          <td>返回带有新键值对的新字典</td>
+      </tr>
+      <tr>
+          <td><code>assoc_in(d, keys, value[, factory])</code></td>
+          <td>返回带有新的、可能嵌套的键值对的新字典</td>
+      </tr>
+      <tr>
+          <td><code>dissoc(d, *keys, **kwargs)</code></td>
+          <td>返回删除给定键的新字典</td>
+      </tr>
+      <tr>
+          <td><code>get_in(keys, coll[, default, no_default])</code></td>
+          <td>返回coll[i0][i1]&hellip;[iX]</td>
+      </tr>
+      <tr>
+          <td><code>itemfilter(predicate, d[, factory])</code></td>
+          <td>按项过滤字典中的项</td>
+      </tr>
+      <tr>
+          <td><code>itemmap(func, d[, factory])</code></td>
+          <td>对字典的项应用函数</td>
+      </tr>
+      <tr>
+          <td><code>keyfilter(predicate, d[, factory])</code></td>
+          <td>按键过滤字典中的项</td>
+      </tr>
+      <tr>
+          <td><code>keymap(func, d[, factory])</code></td>
+          <td>对字典的键应用函数</td>
+      </tr>
+      <tr>
+          <td><code>merge(*dicts, **kwargs)</code></td>
+          <td>合并字典集合</td>
+      </tr>
+      <tr>
+          <td><code>merge_with(func, *dicts, **kwargs)</code></td>
+          <td>合并字典并对合并的值应用函数</td>
+      </tr>
+      <tr>
+          <td><code>update_in(d, keys, func[, default, factory])</code></td>
+          <td>更新嵌套字典值</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="基本使用示例">基本使用示例<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e4%bd%bf%e7%94%a8%e7%a4%ba%e4%be%8b">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Itertoolz 示例</span>
+</span></span><span style="display:flex;"><span>take(<span style="color:#ae81ff">3</span>, [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>])  <span style="color:#75715e"># (1, 2, 3)</span>
+</span></span><span style="display:flex;"><span>drop(<span style="color:#ae81ff">2</span>, [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>])  <span style="color:#75715e"># (3, 4, 5)</span>
+</span></span><span style="display:flex;"><span>first([<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>])  <span style="color:#75715e"># 1</span>
+</span></span><span style="display:flex;"><span>last([<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>])  <span style="color:#75715e"># 3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 分组</span>
+</span></span><span style="display:flex;"><span>groupby(<span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span>, [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>])  <span style="color:#75715e"># {0: [2, 4], 1: [1, 3, 5]}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 函数组合</span>
+</span></span><span style="display:flex;"><span>add1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>mul2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> compose(add1, mul2)
+</span></span><span style="display:flex;"><span>f(<span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># add1(mul2(3)) = 7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 管道</span>
+</span></span><span style="display:flex;"><span>pipe(<span style="color:#ae81ff">3</span>, mul2, add1)  <span style="color:#75715e"># 7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 字典操作</span>
+</span></span><span style="display:flex;"><span>d <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;a&#39;</span>: <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;b&#39;</span>: <span style="color:#ae81ff">2</span>}
+</span></span><span style="display:flex;"><span>assoc(d, <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3}</span></span></span></code></pre></div><h3 id="常用函数-excepts">常用函数 excepts<a class="anchor" href="#%e5%b8%b8%e7%94%a8%e5%87%bd%e6%95%b0-excepts">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 示例1：基本异常捕获</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">divide</span>(x, y):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">/</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建一个安全的除法函数，捕获ZeroDivisionError</span>
+</span></span><span style="display:flex;"><span>safe_divide <span style="color:#f92672">=</span> excepts(<span style="color:#a6e22e">ZeroDivisionError</span>, divide)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>safe_divide(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">2</span>)   <span style="color:#75715e"># 5.0</span>
+</span></span><span style="display:flex;"><span>safe_divide(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">0</span>)   <span style="color:#75715e"># None（异常被捕获）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例2：自定义异常处理程序</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">handle_error</span>(exc):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: </span><span style="color:#e6db74">{</span>exc<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>safe_divide_with_handler <span style="color:#f92672">=</span> excepts(<span style="color:#a6e22e">ZeroDivisionError</span>, divide, handle_error)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>safe_divide_with_handler(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">2</span>)   <span style="color:#75715e"># 5.0</span>
+</span></span><span style="display:flex;"><span>safe_divide_with_handler(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">0</span>)   <span style="color:#75715e"># &#34;Error: division by zero&#34;</span></span></span></code></pre></div><h2 id="functoolz-详细示例">Functoolz 详细示例<a class="anchor" href="#functoolz-%e8%af%a6%e7%bb%86%e7%a4%ba%e4%be%8b">#</a></h2>
+<h3 id="apply---应用函数">apply - 应用函数<a class="anchor" href="#apply---%e5%ba%94%e7%94%a8%e5%87%bd%e6%95%b0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> apply
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(x, y):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">+</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 从元组或列表中解包参数</span>
+</span></span><span style="display:flex;"><span>apply(add, [<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>])  <span style="color:#75715e"># 7</span>
+</span></span><span style="display:flex;"><span>apply(add, (<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">20</span>))  <span style="color:#75715e"># 30</span></span></span></code></pre></div><h3 id="complement---逻辑补集">complement - 逻辑补集<a class="anchor" href="#complement---%e9%80%bb%e8%be%91%e8%a1%a5%e9%9b%86">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> complement
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">is_even</span>(x):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>is_odd <span style="color:#f92672">=</span> complement(is_even)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>is_even(<span style="color:#ae81ff">4</span>)  <span style="color:#75715e"># True</span>
+</span></span><span style="display:flex;"><span>is_odd(<span style="color:#ae81ff">4</span>)   <span style="color:#75715e"># False</span>
+</span></span><span style="display:flex;"><span>is_odd(<span style="color:#ae81ff">5</span>)   <span style="color:#75715e"># True</span></span></span></code></pre></div><h3 id="compose---函数组合从右到左">compose - 函数组合（从右到左）<a class="anchor" href="#compose---%e5%87%bd%e6%95%b0%e7%bb%84%e5%90%88%e4%bb%8e%e5%8f%b3%e5%88%b0%e5%b7%a6">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> compose
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>add1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>mul2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># compose从右到左执行：先mul2再add1</span>
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> compose(add1, mul2)
+</span></span><span style="display:flex;"><span>f(<span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># add1(mul2(3)) = add1(6) = 7</span></span></span></code></pre></div><h3 id="compose_left---函数组合从左到右">compose_left - 函数组合（从左到右）<a class="anchor" href="#compose_left---%e5%87%bd%e6%95%b0%e7%bb%84%e5%90%88%e4%bb%8e%e5%b7%a6%e5%88%b0%e5%8f%b3">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> compose_left
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>add1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>mul2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># compose_left从左到右执行：先add1再mul2</span>
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> compose_left(add1, mul2)
+</span></span><span style="display:flex;"><span>f(<span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># mul2(add1(3)) = mul2(4) = 8</span></span></span></code></pre></div><h3 id="curry---柯里化">curry - 柯里化<a class="anchor" href="#curry---%e6%9f%af%e9%87%8c%e5%8c%96">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> curry
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@curry</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(x, y, z):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">+</span> y <span style="color:#f92672">+</span> z
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可以逐步应用参数</span>
+</span></span><span style="display:flex;"><span>add(<span style="color:#ae81ff">1</span>)(<span style="color:#ae81ff">2</span>)(<span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># 6</span>
+</span></span><span style="display:flex;"><span>add(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>)(<span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># 6</span>
+</span></span><span style="display:flex;"><span>add(<span style="color:#ae81ff">1</span>)(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># 6</span></span></span></code></pre></div><h3 id="do---执行函数并返回原值">do - 执行函数并返回原值<a class="anchor" href="#do---%e6%89%a7%e8%a1%8c%e5%87%bd%e6%95%b0%e5%b9%b6%e8%bf%94%e5%9b%9e%e5%8e%9f%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> do
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">print_value</span>(x):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Value: </span><span style="color:#e6db74">{</span>x<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> do(print_value, <span style="color:#ae81ff">42</span>)  <span style="color:#75715e"># 打印 &#34;Value: 42&#34;</span>
+</span></span><span style="display:flex;"><span>print(result)  <span style="color:#75715e"># 42</span></span></span></code></pre></div><h3 id="flip---翻转参数">flip - 翻转参数<a class="anchor" href="#flip---%e7%bf%bb%e8%bd%ac%e5%8f%82%e6%95%b0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> flip
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">subtract</span>(x, y):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">-</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>flipped_subtract <span style="color:#f92672">=</span> flip(subtract)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>subtract(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">3</span>)      <span style="color:#75715e"># 7</span>
+</span></span><span style="display:flex;"><span>flipped_subtract(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># -7 (3 - 10)</span></span></span></code></pre></div><h3 id="identity---恒等函数">identity - 恒等函数<a class="anchor" href="#identity---%e6%81%92%e7%ad%89%e5%87%bd%e6%95%b0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> identity
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>identity(<span style="color:#ae81ff">42</span>)      <span style="color:#75715e"># 42</span>
+</span></span><span style="display:flex;"><span>identity(<span style="color:#e6db74">&#34;hello&#34;</span>) <span style="color:#75715e"># &#34;hello&#34;</span>
+</span></span><span style="display:flex;"><span>identity([<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>])  <span style="color:#75715e"># [1, 2, 3]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 常用于filter、map等需要函数参数的地方</span>
+</span></span><span style="display:flex;"><span>list(filter(identity, [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#66d9ef">False</span>, <span style="color:#ae81ff">2</span>, <span style="color:#66d9ef">None</span>, <span style="color:#ae81ff">3</span>]))  <span style="color:#75715e"># [1, 2, 3]</span></span></span></code></pre></div><h3 id="juxt---并行调用多个函数">juxt - 并行调用多个函数<a class="anchor" href="#juxt---%e5%b9%b6%e8%a1%8c%e8%b0%83%e7%94%a8%e5%a4%9a%e4%b8%aa%e5%87%bd%e6%95%b0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> juxt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>add1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>mul2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>square <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> juxt(add1, mul2, square)
+</span></span><span style="display:flex;"><span>f(<span style="color:#ae81ff">3</span>)  <span style="color:#75715e"># (4, 6, 9)</span></span></span></code></pre></div><h3 id="memoize---函数缓存">memoize - 函数缓存<a class="anchor" href="#memoize---%e5%87%bd%e6%95%b0%e7%bc%93%e5%ad%98">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> memoize
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@memoize</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fibonacci</span>(n):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> n <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> n
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> fibonacci(n<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span> fibonacci(n<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fibonacci(<span style="color:#ae81ff">10</span>)  <span style="color:#75715e"># 55（结果被缓存）</span>
+</span></span><span style="display:flex;"><span>fibonacci(<span style="color:#ae81ff">10</span>)  <span style="color:#75715e"># 55（直接返回缓存值）</span></span></span></code></pre></div><h3 id="pipe---管道">pipe - 管道<a class="anchor" href="#pipe---%e7%ae%a1%e9%81%93">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> pipe
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>add1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>mul2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>square <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 从左到右依次应用函数</span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> pipe(<span style="color:#ae81ff">3</span>, add1, mul2, square)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ((3 + 1) * 2) ^ 2 = (4 * 2) ^ 2 = 8 ^ 2 = 64</span>
+</span></span><span style="display:flex;"><span>print(result)  <span style="color:#75715e"># 64</span></span></span></code></pre></div><h3 id="thread_first---线程优先">thread_first - 线程优先<a class="anchor" href="#thread_first---%e7%ba%bf%e7%a8%8b%e4%bc%98%e5%85%88">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> thread_first
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 将值作为第一个参数传递给每个函数</span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> thread_first(
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">3</span>,
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ((3 + 1) * 2) ^ 2 = 64</span>
+</span></span><span style="display:flex;"><span>print(result)  <span style="color:#75715e"># 64</span></span></span></code></pre></div><h3 id="thread_last---线程最后">thread_last - 线程最后<a class="anchor" href="#thread_last---%e7%ba%bf%e7%a8%8b%e6%9c%80%e5%90%8e">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> thread_last
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 将值作为最后一个参数传递给每个函数</span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> thread_last(
+</span></span><span style="display:flex;"><span>    [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>],
+</span></span><span style="display:flex;"><span>    (map, <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>),
+</span></span><span style="display:flex;"><span>    list
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># list(map(lambda x: x * 2, [1, 2, 3]))</span>
+</span></span><span style="display:flex;"><span>print(result)  <span style="color:#75715e"># [2, 4, 6]</span></span></span></code></pre></div><h2 id="实战组合示例">实战组合示例<a class="anchor" href="#%e5%ae%9e%e6%88%98%e7%bb%84%e5%90%88%e7%a4%ba%e4%be%8b">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> toolz <span style="color:#f92672">import</span> compose, pipe, curry, memoize, juxt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例1：数据处理管道</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>]
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> pipe(
+</span></span><span style="display:flex;"><span>    data,
+</span></span><span style="display:flex;"><span>    (map, <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>),
+</span></span><span style="display:flex;"><span>    (filter, <span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">4</span>),
+</span></span><span style="display:flex;"><span>    list
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>print(result)  <span style="color:#75715e"># [6, 8, 10]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例2：柯里化与组合</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@curry</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">multiply</span>(x, y):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">*</span> y
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>double <span style="color:#f92672">=</span> multiply(<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>triple <span style="color:#f92672">=</span> multiply(<span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(double(<span style="color:#ae81ff">5</span>))  <span style="color:#75715e"># 10</span>
+</span></span><span style="display:flex;"><span>print(triple(<span style="color:#ae81ff">5</span>))  <span style="color:#75715e"># 15</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例3：多函数并行执行</span>
+</span></span><span style="display:flex;"><span>get_stats <span style="color:#f92672">=</span> juxt(min, max, sum, len)
+</span></span><span style="display:flex;"><span>numbers <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>print(get_stats(numbers))  <span style="color:#75715e"># (1, 9, 20, 5)</span></span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/python/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Python</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/python/itertools/" class="flex align-center">
+        <span>Itertools</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#核心模块">核心模块</a>
+      <ul>
+        <li><a href="#itertoolz---迭代工具">Itertoolz - 迭代工具</a></li>
+        <li><a href="#functoolz---函数工具">Functoolz - 函数工具</a></li>
+        <li><a href="#dicttoolz---字典工具">Dicttoolz - 字典工具</a></li>
+      </ul>
+    </li>
+    <li><a href="#基本使用示例">基本使用示例</a>
+      <ul>
+        <li><a href="#常用函数-excepts">常用函数 excepts</a></li>
+      </ul>
+    </li>
+    <li><a href="#functoolz-详细示例">Functoolz 详细示例</a>
+      <ul>
+        <li><a href="#apply---应用函数">apply - 应用函数</a></li>
+        <li><a href="#complement---逻辑补集">complement - 逻辑补集</a></li>
+        <li><a href="#compose---函数组合从右到左">compose - 函数组合（从右到左）</a></li>
+        <li><a href="#compose_left---函数组合从左到右">compose_left - 函数组合（从左到右）</a></li>
+        <li><a href="#curry---柯里化">curry - 柯里化</a></li>
+        <li><a href="#do---执行函数并返回原值">do - 执行函数并返回原值</a></li>
+        <li><a href="#flip---翻转参数">flip - 翻转参数</a></li>
+        <li><a href="#identity---恒等函数">identity - 恒等函数</a></li>
+        <li><a href="#juxt---并行调用多个函数">juxt - 并行调用多个函数</a></li>
+        <li><a href="#memoize---函数缓存">memoize - 函数缓存</a></li>
+        <li><a href="#pipe---管道">pipe - 管道</a></li>
+        <li><a href="#thread_first---线程优先">thread_first - 线程优先</a></li>
+        <li><a href="#thread_last---线程最后">thread_last - 线程最后</a></li>
+      </ul>
+    </li>
+    <li><a href="#实战组合示例">实战组合示例</a></li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
