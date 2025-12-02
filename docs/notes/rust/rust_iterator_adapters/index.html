@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rust 迭代器适配器完整指南#基础转换适配器#map - 映射转换#let nums = vec![1, 2, 3]; let doubled: Vec&lt;_&gt; = nums.iter().map(|x| x * 2).collect(); // [2, 4, 6] filter - 过滤元素#let nums = vec![1, 2, 3, 4, 5]; let evens: Vec&lt;_&gt; = nums.iter().filter(|x| *x % 2 == 0).collect(); // [2, 4] filter_map - 过滤并映射#let strs = vec![&#34;1&#34;, &#34;two&#34;, &#34;3&#34;]; let nums: Vec&lt;_&gt; = strs.iter().filter_map(|s| s.parse::&lt;i32&gt;().ok()).collect(); // [1, 3] flat_map - 扁平化映射#let words = vec![&#34;hello&#34;, &#34;world&#34;]; let chars: Vec&lt;_&gt; = words.iter().flat_map(|s| s.chars()).collect(); // [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;] flatten - 扁平化嵌套#let nested = vec![vec![1, 2], vec![3, 4]]; let flat: Vec&lt;_&gt; = nested.into_iter().flatten().collect(); // [1, 2, 3, 4] 索引和枚举#enumerate - 添加索引#let letters = vec![&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]; let indexed: Vec&lt;_&gt; = letters.iter().enumerate().collect(); // [(0, &#39;a&#39;), (1, &#39;b&#39;), (2, &#39;c&#39;)] zip - 组合两个迭代器#let nums = vec![1, 2, 3]; let letters = vec![&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]; let pairs: Vec&lt;_&gt; = nums.iter().zip(letters.iter()).collect(); // [(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)] unzip - 分离元组#let pairs = vec![(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)]; let (nums, letters): (Vec&lt;_&gt;, Vec&lt;_&gt;) = pairs.into_iter().unzip(); // nums: [1, 2, 3], letters: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;] 跳过和获取#take - 获取前 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let first_three: Vec&lt;_&gt; = nums.iter().take(3).collect(); // [1, 2, 3] take_while - 获取直到条件不满足#let nums = vec![1, 2, 3, 4, 1, 2]; let result: Vec&lt;_&gt; = nums.iter().take_while(|&amp;&amp;x| x &lt; 4).collect(); // [1, 2, 3] skip - 跳过前 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let last_two: Vec&lt;_&gt; = nums.iter().skip(3).collect(); // [4, 5] skip_while - 跳过直到条件不满足#let nums = vec![1, 2, 3, 4, 1, 2]; let result: Vec&lt;_&gt; = nums.iter().skip_while(|&amp;&amp;x| x &lt; 3).collect(); // [3, 4, 1, 2] step_by - 按步长迭代#let nums = vec![0, 1, 2, 3, 4, 5]; let result: Vec&lt;_&gt; = nums.iter().step_by(2).collect(); // [0, 2, 4] 链接和循环#chain - 连接两个迭代器#let a = vec![1, 2, 3]; let b = vec![4, 5, 6]; let combined: Vec&lt;_&gt; = a.iter().chain(b.iter()).collect(); // [1, 2, 3, 4, 5, 6] cycle - 无限循环迭代器#let nums = vec![1, 2, 3]; let result: Vec&lt;_&gt; = nums.iter().cycle().take(7).collect(); // [1, 2, 3, 1, 2, 3, 1] repeat - 无限重复单个值#let result: Vec&lt;_&gt; = std::iter::repeat(5).take(3).collect(); // [5, 5, 5] repeat_with - 无限重复函数调用#let mut count = 0; let result: Vec&lt;_&gt; = std::iter::repeat_with(|| { count &#43;= 1; count }).take(3).collect(); // [1, 2, 3] 检查和查找#inspect - 检查每个元素（调试用）#let nums = vec![1, 2, 3]; let result: Vec&lt;_&gt; = nums.iter() .inspect(|x| println!(&#34;处理: {}&#34;, x)) .map(|x| x * 2) .collect(); // 打印: 处理: 1, 处理: 2, 处理: 3 // 结果: [2, 4, 6] find - 查找第一个满足条件的元素#let nums = vec![1, 2, 3, 4, 5]; let first_even = nums.iter().find(|&amp;&amp;x| x % 2 == 0); // Some(&amp;2) position - 查找第一个满足条件的位置#let nums = vec![1, 2, 3, 4, 5]; let pos = nums.iter().position(|&amp;x| x == 3); // Some(2) rposition - 从后向前查找位置#let nums = vec![1, 2, 3, 2, 1]; let pos = nums.iter().rposition(|&amp;x| x == 2); // Some(3) 分区和分组#partition - 按条件分成两组#let nums = vec![1, 2, 3, 4, 5]; let (evens, odds): (Vec&lt;_&gt;, Vec&lt;_&gt;) = nums.into_iter().partition(|x| x % 2 == 0); // evens: [2, 4], odds: [1, 3, 5] fold - 折叠（累积）#let nums = vec![1, 2, 3, 4]; let sum = nums.iter().fold(0, |acc, x| acc &#43; x); // 10 reduce - 归约（无初始值）#let nums = vec![1, 2, 3, 4]; let product = nums.iter().reduce(|acc, x| acc * x); // Some(24) scan - 有状态的映射#let nums = vec![1, 2, 3, 4]; let running_sum: Vec&lt;_&gt; = nums.iter().scan(0, |state, x| { *state &#43;= x; Some(*state) }).collect(); // [1, 3, 6, 10] 反转和排序#rev - 反转迭代器#let nums = vec![1, 2, 3]; let reversed: Vec&lt;_&gt; = nums.iter().rev().collect(); // [3, 2, 1] copied - 复制引用的值#let nums = vec![1, 2, 3]; let copied: Vec&lt;_&gt; = nums.iter().copied().collect(); // [1, 2, 3] (拥有所有权) cloned - 克隆引用的值#let strings = vec![String::from(&#34;a&#34;), String::from(&#34;b&#34;)]; let cloned: Vec&lt;_&gt; = strings.iter().cloned().collect(); // [String(&#34;a&#34;), String(&#34;b&#34;)] 窗口和分块#windows - 滑动窗口#let nums = vec![1, 2, 3, 4]; let windows: Vec&lt;_&gt; = nums.windows(2).collect(); // [[1, 2], [2, 3], [3, 4]] chunks - 固定大小分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.chunks(2).collect(); // [[1, 2], [3, 4], [5]] chunks_exact - 精确大小分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.chunks_exact(2).collect(); // [[1, 2], [3, 4]] (不包含 [5]) rchunks - 从后向前分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.rchunks(2).collect(); // [[4, 5], [2, 3], [1]] 比较和判断#all - 所有元素都满足条件#let nums = vec![2, 4, 6]; let all_even = nums.iter().all(|x| x % 2 == 0); // true any - 任意元素满足条件#let nums = vec![1, 3, 4]; let has_even = nums.iter().any(|x| x % 2 == 0); // true eq - 比较两个迭代器是否相等#let a = vec![1, 2, 3]; let b = vec![1, 2, 3]; let equal = a.iter().eq(b.iter()); // true ne - 比较两个迭代器是否不等#let a = vec![1, 2, 3]; let b = vec![1, 2, 4]; let not_equal = a.iter().ne(b.iter()); // true lt / le / gt / ge - 字典序比较#let a = vec![1, 2, 3]; let b = vec![1, 2, 4]; let less = a.iter().lt(b.iter()); // true 计数和统计#count - 计数元素个数#let nums = vec![1, 2, 3, 4, 5]; let count = nums.iter().count(); // 5 sum - 求和#let nums = vec![1, 2, 3, 4]; let total: i32 = nums.iter().sum(); // 10 product - 求积#let nums = vec![1, 2, 3, 4]; let result: i32 = nums.iter().product(); // 24 最值查找#max - 查找最大值#let nums = vec![1, 5, 3, 2]; let max = nums.iter().max(); // Some(&amp;5) min - 查找最小值#let nums = vec![1, 5, 3, 2]; let min = nums.iter().min(); // Some(&amp;1) max_by - 按比较器查找最大值#let nums = vec![-5, 2, -10, 3]; let max = nums.iter().max_by(|a, b| a.abs().cmp(&amp;b.abs())); // Some(&amp;-10) min_by - 按比较器查找最小值#let nums = vec![-5, 2, -10, 3]; let min = nums.iter().min_by(|a, b| a.abs().cmp(&amp;b.abs())); // Some(&amp;2) max_by_key - 按键函数查找最大值#let words = vec![&#34;a&#34;, &#34;bbb&#34;, &#34;cc&#34;]; let longest = words.iter().max_by_key(|s| s.len()); // Some(&amp;&#34;bbb&#34;) min_by_key - 按键函数查找最小值#let words = vec![&#34;a&#34;, &#34;bbb&#34;, &#34;cc&#34;]; let shortest = words.iter().min_by_key(|s| s.len()); // Some(&amp;&#34;a&#34;) 特殊操作#nth - 获取第 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let third = nums.iter().nth(2); // Some(&amp;3) last - 获取最后一个元素#let nums = vec![1, 2, 3]; let last = nums.iter().last(); // Some(&amp;3) peekable - 可预览下一个元素#let nums = vec![1, 2, 3]; let mut iter = nums.iter().peekable(); assert_eq!(iter.peek(), Some(&amp;&amp;1)); assert_eq!(iter.next(), Some(&amp;1));fuse - 确保迭代器结束后不再产生元素#let nums = vec![1, 2, 3]; let mut iter = nums.iter().fuse(); // 即使多次调用 next()，结束后始终返回 None by_ref - 借用迭代器#let nums = vec![1, 2, 3, 4, 5]; let mut iter = nums.iter(); let first_two: Vec&lt;_&gt; = iter.by_ref().take(2).collect(); let rest: Vec&lt;_&gt; = iter.collect(); // first_two: [1, 2], rest: [3, 4, 5] 收集和消费#collect - 收集到集合#let nums = vec![1, 2, 3]; let doubled: Vec&lt;_&gt; = nums.iter().map(|x| x * 2).collect(); // [2, 4, 6] for_each - 对每个元素执行操作#let nums = vec![1, 2, 3]; nums.iter().for_each(|x| println!(&#34;{}&#34;, x)); // 打印: 1, 2, 3 try_fold - 可失败的折叠#let nums = vec![1, 2, 3]; let result: Result&lt;i32, &amp;str&gt; = nums.iter().try_fold(0, |acc, &amp;x| { if x &gt; 0 { Ok(acc &#43; x) } else { Err(&#34;负数&#34;) } }); // Ok(6) try_for_each - 可失败的遍历#let nums = vec![1, 2, 3]; let result: Result&lt;(), &amp;str&gt; = nums.iter().try_for_each(|&amp;x| { if x &gt; 0 { Ok(()) } else { Err(&#34;负数&#34;) } }); // Ok(()) 组合示例#复杂链式调用#let result: i32 = (1..=10) .filter(|x| x % 2 == 0) // 偶数 .map(|x| x * x) // 平方 .take(3) // 前3个 .sum(); // 求和 // 2² &#43; 4² &#43; 6² = 4 &#43; 16 &#43; 36 = 56 多重过滤和转换#let words = vec![&#34;hello&#34;, &#34;world&#34;, &#34;rust&#34;, &#34;programming&#34;]; let result: Vec&lt;_&gt; = words.iter() .filter(|s| s.len() &gt; 4) .map(|s| s.to_uppercase()) .collect(); // [&#34;HELLO&#34;, &#34;WORLD&#34;, &#34;PROGRAMMING&#34;] 分组统计#use std::collections::HashMap; let words = vec![&#34;apple&#34;, &#34;banana&#34;, &#34;apricot&#34;, &#34;blueberry&#34;]; let grouped: HashMap&lt;char, Vec&lt;&amp;str&gt;&gt; = words.iter() .fold(HashMap::new(), |mut acc, word| { acc.entry(word.chars().next().unwrap()) .or_insert_with(Vec::new) .push(word); acc }); // {&#39;a&#39;: [&#34;apple&#34;, &#34;apricot&#34;], &#39;b&#39;: [&#34;banana&#34;, &#34;blueberry&#34;]} ">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_iterator_adapters/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="Rust 迭代器适配器完整指南#基础转换适配器#map - 映射转换#let nums = vec![1, 2, 3]; let doubled: Vec&lt;_&gt; = nums.iter().map(|x| x * 2).collect(); // [2, 4, 6] filter - 过滤元素#let nums = vec![1, 2, 3, 4, 5]; let evens: Vec&lt;_&gt; = nums.iter().filter(|x| *x % 2 == 0).collect(); // [2, 4] filter_map - 过滤并映射#let strs = vec![&#34;1&#34;, &#34;two&#34;, &#34;3&#34;]; let nums: Vec&lt;_&gt; = strs.iter().filter_map(|s| s.parse::&lt;i32&gt;().ok()).collect(); // [1, 3] flat_map - 扁平化映射#let words = vec![&#34;hello&#34;, &#34;world&#34;]; let chars: Vec&lt;_&gt; = words.iter().flat_map(|s| s.chars()).collect(); // [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;] flatten - 扁平化嵌套#let nested = vec![vec![1, 2], vec![3, 4]]; let flat: Vec&lt;_&gt; = nested.into_iter().flatten().collect(); // [1, 2, 3, 4] 索引和枚举#enumerate - 添加索引#let letters = vec![&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]; let indexed: Vec&lt;_&gt; = letters.iter().enumerate().collect(); // [(0, &#39;a&#39;), (1, &#39;b&#39;), (2, &#39;c&#39;)] zip - 组合两个迭代器#let nums = vec![1, 2, 3]; let letters = vec![&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]; let pairs: Vec&lt;_&gt; = nums.iter().zip(letters.iter()).collect(); // [(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)] unzip - 分离元组#let pairs = vec![(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)]; let (nums, letters): (Vec&lt;_&gt;, Vec&lt;_&gt;) = pairs.into_iter().unzip(); // nums: [1, 2, 3], letters: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;] 跳过和获取#take - 获取前 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let first_three: Vec&lt;_&gt; = nums.iter().take(3).collect(); // [1, 2, 3] take_while - 获取直到条件不满足#let nums = vec![1, 2, 3, 4, 1, 2]; let result: Vec&lt;_&gt; = nums.iter().take_while(|&amp;&amp;x| x &lt; 4).collect(); // [1, 2, 3] skip - 跳过前 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let last_two: Vec&lt;_&gt; = nums.iter().skip(3).collect(); // [4, 5] skip_while - 跳过直到条件不满足#let nums = vec![1, 2, 3, 4, 1, 2]; let result: Vec&lt;_&gt; = nums.iter().skip_while(|&amp;&amp;x| x &lt; 3).collect(); // [3, 4, 1, 2] step_by - 按步长迭代#let nums = vec![0, 1, 2, 3, 4, 5]; let result: Vec&lt;_&gt; = nums.iter().step_by(2).collect(); // [0, 2, 4] 链接和循环#chain - 连接两个迭代器#let a = vec![1, 2, 3]; let b = vec![4, 5, 6]; let combined: Vec&lt;_&gt; = a.iter().chain(b.iter()).collect(); // [1, 2, 3, 4, 5, 6] cycle - 无限循环迭代器#let nums = vec![1, 2, 3]; let result: Vec&lt;_&gt; = nums.iter().cycle().take(7).collect(); // [1, 2, 3, 1, 2, 3, 1] repeat - 无限重复单个值#let result: Vec&lt;_&gt; = std::iter::repeat(5).take(3).collect(); // [5, 5, 5] repeat_with - 无限重复函数调用#let mut count = 0; let result: Vec&lt;_&gt; = std::iter::repeat_with(|| { count &#43;= 1; count }).take(3).collect(); // [1, 2, 3] 检查和查找#inspect - 检查每个元素（调试用）#let nums = vec![1, 2, 3]; let result: Vec&lt;_&gt; = nums.iter() .inspect(|x| println!(&#34;处理: {}&#34;, x)) .map(|x| x * 2) .collect(); // 打印: 处理: 1, 处理: 2, 处理: 3 // 结果: [2, 4, 6] find - 查找第一个满足条件的元素#let nums = vec![1, 2, 3, 4, 5]; let first_even = nums.iter().find(|&amp;&amp;x| x % 2 == 0); // Some(&amp;2) position - 查找第一个满足条件的位置#let nums = vec![1, 2, 3, 4, 5]; let pos = nums.iter().position(|&amp;x| x == 3); // Some(2) rposition - 从后向前查找位置#let nums = vec![1, 2, 3, 2, 1]; let pos = nums.iter().rposition(|&amp;x| x == 2); // Some(3) 分区和分组#partition - 按条件分成两组#let nums = vec![1, 2, 3, 4, 5]; let (evens, odds): (Vec&lt;_&gt;, Vec&lt;_&gt;) = nums.into_iter().partition(|x| x % 2 == 0); // evens: [2, 4], odds: [1, 3, 5] fold - 折叠（累积）#let nums = vec![1, 2, 3, 4]; let sum = nums.iter().fold(0, |acc, x| acc &#43; x); // 10 reduce - 归约（无初始值）#let nums = vec![1, 2, 3, 4]; let product = nums.iter().reduce(|acc, x| acc * x); // Some(24) scan - 有状态的映射#let nums = vec![1, 2, 3, 4]; let running_sum: Vec&lt;_&gt; = nums.iter().scan(0, |state, x| { *state &#43;= x; Some(*state) }).collect(); // [1, 3, 6, 10] 反转和排序#rev - 反转迭代器#let nums = vec![1, 2, 3]; let reversed: Vec&lt;_&gt; = nums.iter().rev().collect(); // [3, 2, 1] copied - 复制引用的值#let nums = vec![1, 2, 3]; let copied: Vec&lt;_&gt; = nums.iter().copied().collect(); // [1, 2, 3] (拥有所有权) cloned - 克隆引用的值#let strings = vec![String::from(&#34;a&#34;), String::from(&#34;b&#34;)]; let cloned: Vec&lt;_&gt; = strings.iter().cloned().collect(); // [String(&#34;a&#34;), String(&#34;b&#34;)] 窗口和分块#windows - 滑动窗口#let nums = vec![1, 2, 3, 4]; let windows: Vec&lt;_&gt; = nums.windows(2).collect(); // [[1, 2], [2, 3], [3, 4]] chunks - 固定大小分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.chunks(2).collect(); // [[1, 2], [3, 4], [5]] chunks_exact - 精确大小分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.chunks_exact(2).collect(); // [[1, 2], [3, 4]] (不包含 [5]) rchunks - 从后向前分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.rchunks(2).collect(); // [[4, 5], [2, 3], [1]] 比较和判断#all - 所有元素都满足条件#let nums = vec![2, 4, 6]; let all_even = nums.iter().all(|x| x % 2 == 0); // true any - 任意元素满足条件#let nums = vec![1, 3, 4]; let has_even = nums.iter().any(|x| x % 2 == 0); // true eq - 比较两个迭代器是否相等#let a = vec![1, 2, 3]; let b = vec![1, 2, 3]; let equal = a.iter().eq(b.iter()); // true ne - 比较两个迭代器是否不等#let a = vec![1, 2, 3]; let b = vec![1, 2, 4]; let not_equal = a.iter().ne(b.iter()); // true lt / le / gt / ge - 字典序比较#let a = vec![1, 2, 3]; let b = vec![1, 2, 4]; let less = a.iter().lt(b.iter()); // true 计数和统计#count - 计数元素个数#let nums = vec![1, 2, 3, 4, 5]; let count = nums.iter().count(); // 5 sum - 求和#let nums = vec![1, 2, 3, 4]; let total: i32 = nums.iter().sum(); // 10 product - 求积#let nums = vec![1, 2, 3, 4]; let result: i32 = nums.iter().product(); // 24 最值查找#max - 查找最大值#let nums = vec![1, 5, 3, 2]; let max = nums.iter().max(); // Some(&amp;5) min - 查找最小值#let nums = vec![1, 5, 3, 2]; let min = nums.iter().min(); // Some(&amp;1) max_by - 按比较器查找最大值#let nums = vec![-5, 2, -10, 3]; let max = nums.iter().max_by(|a, b| a.abs().cmp(&amp;b.abs())); // Some(&amp;-10) min_by - 按比较器查找最小值#let nums = vec![-5, 2, -10, 3]; let min = nums.iter().min_by(|a, b| a.abs().cmp(&amp;b.abs())); // Some(&amp;2) max_by_key - 按键函数查找最大值#let words = vec![&#34;a&#34;, &#34;bbb&#34;, &#34;cc&#34;]; let longest = words.iter().max_by_key(|s| s.len()); // Some(&amp;&#34;bbb&#34;) min_by_key - 按键函数查找最小值#let words = vec![&#34;a&#34;, &#34;bbb&#34;, &#34;cc&#34;]; let shortest = words.iter().min_by_key(|s| s.len()); // Some(&amp;&#34;a&#34;) 特殊操作#nth - 获取第 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let third = nums.iter().nth(2); // Some(&amp;3) last - 获取最后一个元素#let nums = vec![1, 2, 3]; let last = nums.iter().last(); // Some(&amp;3) peekable - 可预览下一个元素#let nums = vec![1, 2, 3]; let mut iter = nums.iter().peekable(); assert_eq!(iter.peek(), Some(&amp;&amp;1)); assert_eq!(iter.next(), Some(&amp;1));fuse - 确保迭代器结束后不再产生元素#let nums = vec![1, 2, 3]; let mut iter = nums.iter().fuse(); // 即使多次调用 next()，结束后始终返回 None by_ref - 借用迭代器#let nums = vec![1, 2, 3, 4, 5]; let mut iter = nums.iter(); let first_two: Vec&lt;_&gt; = iter.by_ref().take(2).collect(); let rest: Vec&lt;_&gt; = iter.collect(); // first_two: [1, 2], rest: [3, 4, 5] 收集和消费#collect - 收集到集合#let nums = vec![1, 2, 3]; let doubled: Vec&lt;_&gt; = nums.iter().map(|x| x * 2).collect(); // [2, 4, 6] for_each - 对每个元素执行操作#let nums = vec![1, 2, 3]; nums.iter().for_each(|x| println!(&#34;{}&#34;, x)); // 打印: 1, 2, 3 try_fold - 可失败的折叠#let nums = vec![1, 2, 3]; let result: Result&lt;i32, &amp;str&gt; = nums.iter().try_fold(0, |acc, &amp;x| { if x &gt; 0 { Ok(acc &#43; x) } else { Err(&#34;负数&#34;) } }); // Ok(6) try_for_each - 可失败的遍历#let nums = vec![1, 2, 3]; let result: Result&lt;(), &amp;str&gt; = nums.iter().try_for_each(|&amp;x| { if x &gt; 0 { Ok(()) } else { Err(&#34;负数&#34;) } }); // Ok(()) 组合示例#复杂链式调用#let result: i32 = (1..=10) .filter(|x| x % 2 == 0) // 偶数 .map(|x| x * x) // 平方 .take(3) // 前3个 .sum(); // 求和 // 2² &#43; 4² &#43; 6² = 4 &#43; 16 &#43; 36 = 56 多重过滤和转换#let words = vec![&#34;hello&#34;, &#34;world&#34;, &#34;rust&#34;, &#34;programming&#34;]; let result: Vec&lt;_&gt; = words.iter() .filter(|s| s.len() &gt; 4) .map(|s| s.to_uppercase()) .collect(); // [&#34;HELLO&#34;, &#34;WORLD&#34;, &#34;PROGRAMMING&#34;] 分组统计#use std::collections::HashMap; let words = vec![&#34;apple&#34;, &#34;banana&#34;, &#34;apricot&#34;, &#34;blueberry&#34;]; let grouped: HashMap&lt;char, Vec&lt;&amp;str&gt;&gt; = words.iter() .fold(HashMap::new(), |mut acc, word| { acc.entry(word.chars().next().unwrap()) .or_insert_with(Vec::new) .push(word); acc }); // {&#39;a&#39;: [&#34;apple&#34;, &#34;apricot&#34;], &#39;b&#39;: [&#34;banana&#34;, &#34;blueberry&#34;]}">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="Rust 迭代器适配器完整指南#基础转换适配器#map - 映射转换#let nums = vec![1, 2, 3]; let doubled: Vec&lt;_&gt; = nums.iter().map(|x| x * 2).collect(); // [2, 4, 6] filter - 过滤元素#let nums = vec![1, 2, 3, 4, 5]; let evens: Vec&lt;_&gt; = nums.iter().filter(|x| *x % 2 == 0).collect(); // [2, 4] filter_map - 过滤并映射#let strs = vec![&#34;1&#34;, &#34;two&#34;, &#34;3&#34;]; let nums: Vec&lt;_&gt; = strs.iter().filter_map(|s| s.parse::&lt;i32&gt;().ok()).collect(); // [1, 3] flat_map - 扁平化映射#let words = vec![&#34;hello&#34;, &#34;world&#34;]; let chars: Vec&lt;_&gt; = words.iter().flat_map(|s| s.chars()).collect(); // [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;] flatten - 扁平化嵌套#let nested = vec![vec![1, 2], vec![3, 4]]; let flat: Vec&lt;_&gt; = nested.into_iter().flatten().collect(); // [1, 2, 3, 4] 索引和枚举#enumerate - 添加索引#let letters = vec![&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]; let indexed: Vec&lt;_&gt; = letters.iter().enumerate().collect(); // [(0, &#39;a&#39;), (1, &#39;b&#39;), (2, &#39;c&#39;)] zip - 组合两个迭代器#let nums = vec![1, 2, 3]; let letters = vec![&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]; let pairs: Vec&lt;_&gt; = nums.iter().zip(letters.iter()).collect(); // [(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)] unzip - 分离元组#let pairs = vec![(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)]; let (nums, letters): (Vec&lt;_&gt;, Vec&lt;_&gt;) = pairs.into_iter().unzip(); // nums: [1, 2, 3], letters: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;] 跳过和获取#take - 获取前 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let first_three: Vec&lt;_&gt; = nums.iter().take(3).collect(); // [1, 2, 3] take_while - 获取直到条件不满足#let nums = vec![1, 2, 3, 4, 1, 2]; let result: Vec&lt;_&gt; = nums.iter().take_while(|&amp;&amp;x| x &lt; 4).collect(); // [1, 2, 3] skip - 跳过前 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let last_two: Vec&lt;_&gt; = nums.iter().skip(3).collect(); // [4, 5] skip_while - 跳过直到条件不满足#let nums = vec![1, 2, 3, 4, 1, 2]; let result: Vec&lt;_&gt; = nums.iter().skip_while(|&amp;&amp;x| x &lt; 3).collect(); // [3, 4, 1, 2] step_by - 按步长迭代#let nums = vec![0, 1, 2, 3, 4, 5]; let result: Vec&lt;_&gt; = nums.iter().step_by(2).collect(); // [0, 2, 4] 链接和循环#chain - 连接两个迭代器#let a = vec![1, 2, 3]; let b = vec![4, 5, 6]; let combined: Vec&lt;_&gt; = a.iter().chain(b.iter()).collect(); // [1, 2, 3, 4, 5, 6] cycle - 无限循环迭代器#let nums = vec![1, 2, 3]; let result: Vec&lt;_&gt; = nums.iter().cycle().take(7).collect(); // [1, 2, 3, 1, 2, 3, 1] repeat - 无限重复单个值#let result: Vec&lt;_&gt; = std::iter::repeat(5).take(3).collect(); // [5, 5, 5] repeat_with - 无限重复函数调用#let mut count = 0; let result: Vec&lt;_&gt; = std::iter::repeat_with(|| { count &#43;= 1; count }).take(3).collect(); // [1, 2, 3] 检查和查找#inspect - 检查每个元素（调试用）#let nums = vec![1, 2, 3]; let result: Vec&lt;_&gt; = nums.iter() .inspect(|x| println!(&#34;处理: {}&#34;, x)) .map(|x| x * 2) .collect(); // 打印: 处理: 1, 处理: 2, 处理: 3 // 结果: [2, 4, 6] find - 查找第一个满足条件的元素#let nums = vec![1, 2, 3, 4, 5]; let first_even = nums.iter().find(|&amp;&amp;x| x % 2 == 0); // Some(&amp;2) position - 查找第一个满足条件的位置#let nums = vec![1, 2, 3, 4, 5]; let pos = nums.iter().position(|&amp;x| x == 3); // Some(2) rposition - 从后向前查找位置#let nums = vec![1, 2, 3, 2, 1]; let pos = nums.iter().rposition(|&amp;x| x == 2); // Some(3) 分区和分组#partition - 按条件分成两组#let nums = vec![1, 2, 3, 4, 5]; let (evens, odds): (Vec&lt;_&gt;, Vec&lt;_&gt;) = nums.into_iter().partition(|x| x % 2 == 0); // evens: [2, 4], odds: [1, 3, 5] fold - 折叠（累积）#let nums = vec![1, 2, 3, 4]; let sum = nums.iter().fold(0, |acc, x| acc &#43; x); // 10 reduce - 归约（无初始值）#let nums = vec![1, 2, 3, 4]; let product = nums.iter().reduce(|acc, x| acc * x); // Some(24) scan - 有状态的映射#let nums = vec![1, 2, 3, 4]; let running_sum: Vec&lt;_&gt; = nums.iter().scan(0, |state, x| { *state &#43;= x; Some(*state) }).collect(); // [1, 3, 6, 10] 反转和排序#rev - 反转迭代器#let nums = vec![1, 2, 3]; let reversed: Vec&lt;_&gt; = nums.iter().rev().collect(); // [3, 2, 1] copied - 复制引用的值#let nums = vec![1, 2, 3]; let copied: Vec&lt;_&gt; = nums.iter().copied().collect(); // [1, 2, 3] (拥有所有权) cloned - 克隆引用的值#let strings = vec![String::from(&#34;a&#34;), String::from(&#34;b&#34;)]; let cloned: Vec&lt;_&gt; = strings.iter().cloned().collect(); // [String(&#34;a&#34;), String(&#34;b&#34;)] 窗口和分块#windows - 滑动窗口#let nums = vec![1, 2, 3, 4]; let windows: Vec&lt;_&gt; = nums.windows(2).collect(); // [[1, 2], [2, 3], [3, 4]] chunks - 固定大小分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.chunks(2).collect(); // [[1, 2], [3, 4], [5]] chunks_exact - 精确大小分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.chunks_exact(2).collect(); // [[1, 2], [3, 4]] (不包含 [5]) rchunks - 从后向前分块#let nums = vec![1, 2, 3, 4, 5]; let chunks: Vec&lt;_&gt; = nums.rchunks(2).collect(); // [[4, 5], [2, 3], [1]] 比较和判断#all - 所有元素都满足条件#let nums = vec![2, 4, 6]; let all_even = nums.iter().all(|x| x % 2 == 0); // true any - 任意元素满足条件#let nums = vec![1, 3, 4]; let has_even = nums.iter().any(|x| x % 2 == 0); // true eq - 比较两个迭代器是否相等#let a = vec![1, 2, 3]; let b = vec![1, 2, 3]; let equal = a.iter().eq(b.iter()); // true ne - 比较两个迭代器是否不等#let a = vec![1, 2, 3]; let b = vec![1, 2, 4]; let not_equal = a.iter().ne(b.iter()); // true lt / le / gt / ge - 字典序比较#let a = vec![1, 2, 3]; let b = vec![1, 2, 4]; let less = a.iter().lt(b.iter()); // true 计数和统计#count - 计数元素个数#let nums = vec![1, 2, 3, 4, 5]; let count = nums.iter().count(); // 5 sum - 求和#let nums = vec![1, 2, 3, 4]; let total: i32 = nums.iter().sum(); // 10 product - 求积#let nums = vec![1, 2, 3, 4]; let result: i32 = nums.iter().product(); // 24 最值查找#max - 查找最大值#let nums = vec![1, 5, 3, 2]; let max = nums.iter().max(); // Some(&amp;5) min - 查找最小值#let nums = vec![1, 5, 3, 2]; let min = nums.iter().min(); // Some(&amp;1) max_by - 按比较器查找最大值#let nums = vec![-5, 2, -10, 3]; let max = nums.iter().max_by(|a, b| a.abs().cmp(&amp;b.abs())); // Some(&amp;-10) min_by - 按比较器查找最小值#let nums = vec![-5, 2, -10, 3]; let min = nums.iter().min_by(|a, b| a.abs().cmp(&amp;b.abs())); // Some(&amp;2) max_by_key - 按键函数查找最大值#let words = vec![&#34;a&#34;, &#34;bbb&#34;, &#34;cc&#34;]; let longest = words.iter().max_by_key(|s| s.len()); // Some(&amp;&#34;bbb&#34;) min_by_key - 按键函数查找最小值#let words = vec![&#34;a&#34;, &#34;bbb&#34;, &#34;cc&#34;]; let shortest = words.iter().min_by_key(|s| s.len()); // Some(&amp;&#34;a&#34;) 特殊操作#nth - 获取第 n 个元素#let nums = vec![1, 2, 3, 4, 5]; let third = nums.iter().nth(2); // Some(&amp;3) last - 获取最后一个元素#let nums = vec![1, 2, 3]; let last = nums.iter().last(); // Some(&amp;3) peekable - 可预览下一个元素#let nums = vec![1, 2, 3]; let mut iter = nums.iter().peekable(); assert_eq!(iter.peek(), Some(&amp;&amp;1)); assert_eq!(iter.next(), Some(&amp;1));fuse - 确保迭代器结束后不再产生元素#let nums = vec![1, 2, 3]; let mut iter = nums.iter().fuse(); // 即使多次调用 next()，结束后始终返回 None by_ref - 借用迭代器#let nums = vec![1, 2, 3, 4, 5]; let mut iter = nums.iter(); let first_two: Vec&lt;_&gt; = iter.by_ref().take(2).collect(); let rest: Vec&lt;_&gt; = iter.collect(); // first_two: [1, 2], rest: [3, 4, 5] 收集和消费#collect - 收集到集合#let nums = vec![1, 2, 3]; let doubled: Vec&lt;_&gt; = nums.iter().map(|x| x * 2).collect(); // [2, 4, 6] for_each - 对每个元素执行操作#let nums = vec![1, 2, 3]; nums.iter().for_each(|x| println!(&#34;{}&#34;, x)); // 打印: 1, 2, 3 try_fold - 可失败的折叠#let nums = vec![1, 2, 3]; let result: Result&lt;i32, &amp;str&gt; = nums.iter().try_fold(0, |acc, &amp;x| { if x &gt; 0 { Ok(acc &#43; x) } else { Err(&#34;负数&#34;) } }); // Ok(6) try_for_each - 可失败的遍历#let nums = vec![1, 2, 3]; let result: Result&lt;(), &amp;str&gt; = nums.iter().try_for_each(|&amp;x| { if x &gt; 0 { Ok(()) } else { Err(&#34;负数&#34;) } }); // Ok(()) 组合示例#复杂链式调用#let result: i32 = (1..=10) .filter(|x| x % 2 == 0) // 偶数 .map(|x| x * x) // 平方 .take(3) // 前3个 .sum(); // 求和 // 2² &#43; 4² &#43; 6² = 4 &#43; 16 &#43; 36 = 56 多重过滤和转换#let words = vec![&#34;hello&#34;, &#34;world&#34;, &#34;rust&#34;, &#34;programming&#34;]; let result: Vec&lt;_&gt; = words.iter() .filter(|s| s.len() &gt; 4) .map(|s| s.to_uppercase()) .collect(); // [&#34;HELLO&#34;, &#34;WORLD&#34;, &#34;PROGRAMMING&#34;] 分组统计#use std::collections::HashMap; let words = vec![&#34;apple&#34;, &#34;banana&#34;, &#34;apricot&#34;, &#34;blueberry&#34;]; let grouped: HashMap&lt;char, Vec&lt;&amp;str&gt;&gt; = words.iter() .fold(HashMap::new(), |mut acc, word| { acc.entry(word.chars().next().unwrap()) .or_insert_with(Vec::new) .push(word); acc }); // {&#39;a&#39;: [&#34;apple&#34;, &#34;apricot&#34;], &#39;b&#39;: [&#34;banana&#34;, &#34;blueberry&#34;]}">
+  <meta itemprop="wordCount" content="1299">
+
+<title>Rust Iterator Adapters | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_iterator_adapters/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.a89209c2b7108af56ce60ff1b34d91c3dcc02d290cd0c3a8a4f2be10b9b4be9a.js" integrity="sha256-qJIJwrcQivVs5g/xs02Rw9zALSkM0MOopPK&#43;ELm0vpo=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle" checked />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="">
+      Rust Algorithm</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="active">
+      Rust Iterator Adapters</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/medical_imaging/" class="">
+      Medical Imaging</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Rust Iterator Adapters</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#基础转换适配器">基础转换适配器</a>
+      <ul>
+        <li><a href="#map---映射转换"><code>map</code> - 映射转换</a></li>
+        <li><a href="#filter---过滤元素"><code>filter</code> - 过滤元素</a></li>
+        <li><a href="#filter_map---过滤并映射"><code>filter_map</code> - 过滤并映射</a></li>
+        <li><a href="#flat_map---扁平化映射"><code>flat_map</code> - 扁平化映射</a></li>
+        <li><a href="#flatten---扁平化嵌套"><code>flatten</code> - 扁平化嵌套</a></li>
+      </ul>
+    </li>
+    <li><a href="#索引和枚举">索引和枚举</a>
+      <ul>
+        <li><a href="#enumerate---添加索引"><code>enumerate</code> - 添加索引</a></li>
+        <li><a href="#zip---组合两个迭代器"><code>zip</code> - 组合两个迭代器</a></li>
+        <li><a href="#unzip---分离元组"><code>unzip</code> - 分离元组</a></li>
+      </ul>
+    </li>
+    <li><a href="#跳过和获取">跳过和获取</a>
+      <ul>
+        <li><a href="#take---获取前-n-个元素"><code>take</code> - 获取前 n 个元素</a></li>
+        <li><a href="#take_while---获取直到条件不满足"><code>take_while</code> - 获取直到条件不满足</a></li>
+        <li><a href="#skip---跳过前-n-个元素"><code>skip</code> - 跳过前 n 个元素</a></li>
+        <li><a href="#skip_while---跳过直到条件不满足"><code>skip_while</code> - 跳过直到条件不满足</a></li>
+        <li><a href="#step_by---按步长迭代"><code>step_by</code> - 按步长迭代</a></li>
+      </ul>
+    </li>
+    <li><a href="#链接和循环">链接和循环</a>
+      <ul>
+        <li><a href="#chain---连接两个迭代器"><code>chain</code> - 连接两个迭代器</a></li>
+        <li><a href="#cycle---无限循环迭代器"><code>cycle</code> - 无限循环迭代器</a></li>
+        <li><a href="#repeat---无限重复单个值"><code>repeat</code> - 无限重复单个值</a></li>
+        <li><a href="#repeat_with---无限重复函数调用"><code>repeat_with</code> - 无限重复函数调用</a></li>
+      </ul>
+    </li>
+    <li><a href="#检查和查找">检查和查找</a>
+      <ul>
+        <li><a href="#inspect---检查每个元素调试用"><code>inspect</code> - 检查每个元素（调试用）</a></li>
+        <li><a href="#find---查找第一个满足条件的元素"><code>find</code> - 查找第一个满足条件的元素</a></li>
+        <li><a href="#position---查找第一个满足条件的位置"><code>position</code> - 查找第一个满足条件的位置</a></li>
+        <li><a href="#rposition---从后向前查找位置"><code>rposition</code> - 从后向前查找位置</a></li>
+      </ul>
+    </li>
+    <li><a href="#分区和分组">分区和分组</a>
+      <ul>
+        <li><a href="#partition---按条件分成两组"><code>partition</code> - 按条件分成两组</a></li>
+        <li><a href="#fold---折叠累积"><code>fold</code> - 折叠（累积）</a></li>
+        <li><a href="#reduce---归约无初始值"><code>reduce</code> - 归约（无初始值）</a></li>
+        <li><a href="#scan---有状态的映射"><code>scan</code> - 有状态的映射</a></li>
+      </ul>
+    </li>
+    <li><a href="#反转和排序">反转和排序</a>
+      <ul>
+        <li><a href="#rev---反转迭代器"><code>rev</code> - 反转迭代器</a></li>
+        <li><a href="#copied---复制引用的值"><code>copied</code> - 复制引用的值</a></li>
+        <li><a href="#cloned---克隆引用的值"><code>cloned</code> - 克隆引用的值</a></li>
+      </ul>
+    </li>
+    <li><a href="#窗口和分块">窗口和分块</a>
+      <ul>
+        <li><a href="#windows---滑动窗口"><code>windows</code> - 滑动窗口</a></li>
+        <li><a href="#chunks---固定大小分块"><code>chunks</code> - 固定大小分块</a></li>
+        <li><a href="#chunks_exact---精确大小分块"><code>chunks_exact</code> - 精确大小分块</a></li>
+        <li><a href="#rchunks---从后向前分块"><code>rchunks</code> - 从后向前分块</a></li>
+      </ul>
+    </li>
+    <li><a href="#比较和判断">比较和判断</a>
+      <ul>
+        <li><a href="#all---所有元素都满足条件"><code>all</code> - 所有元素都满足条件</a></li>
+        <li><a href="#any---任意元素满足条件"><code>any</code> - 任意元素满足条件</a></li>
+        <li><a href="#eq---比较两个迭代器是否相等"><code>eq</code> - 比较两个迭代器是否相等</a></li>
+        <li><a href="#ne---比较两个迭代器是否不等"><code>ne</code> - 比较两个迭代器是否不等</a></li>
+        <li><a href="#lt--le--gt--ge---字典序比较"><code>lt</code> / <code>le</code> / <code>gt</code> / <code>ge</code> - 字典序比较</a></li>
+      </ul>
+    </li>
+    <li><a href="#计数和统计">计数和统计</a>
+      <ul>
+        <li><a href="#count---计数元素个数"><code>count</code> - 计数元素个数</a></li>
+        <li><a href="#sum---求和"><code>sum</code> - 求和</a></li>
+        <li><a href="#product---求积"><code>product</code> - 求积</a></li>
+      </ul>
+    </li>
+    <li><a href="#最值查找">最值查找</a>
+      <ul>
+        <li><a href="#max---查找最大值"><code>max</code> - 查找最大值</a></li>
+        <li><a href="#min---查找最小值"><code>min</code> - 查找最小值</a></li>
+        <li><a href="#max_by---按比较器查找最大值"><code>max_by</code> - 按比较器查找最大值</a></li>
+        <li><a href="#min_by---按比较器查找最小值"><code>min_by</code> - 按比较器查找最小值</a></li>
+        <li><a href="#max_by_key---按键函数查找最大值"><code>max_by_key</code> - 按键函数查找最大值</a></li>
+        <li><a href="#min_by_key---按键函数查找最小值"><code>min_by_key</code> - 按键函数查找最小值</a></li>
+      </ul>
+    </li>
+    <li><a href="#特殊操作">特殊操作</a>
+      <ul>
+        <li><a href="#nth---获取第-n-个元素"><code>nth</code> - 获取第 n 个元素</a></li>
+        <li><a href="#last---获取最后一个元素"><code>last</code> - 获取最后一个元素</a></li>
+        <li><a href="#peekable---可预览下一个元素"><code>peekable</code> - 可预览下一个元素</a></li>
+        <li><a href="#fuse---确保迭代器结束后不再产生元素"><code>fuse</code> - 确保迭代器结束后不再产生元素</a></li>
+        <li><a href="#by_ref---借用迭代器"><code>by_ref</code> - 借用迭代器</a></li>
+      </ul>
+    </li>
+    <li><a href="#收集和消费">收集和消费</a>
+      <ul>
+        <li><a href="#collect---收集到集合"><code>collect</code> - 收集到集合</a></li>
+        <li><a href="#for_each---对每个元素执行操作"><code>for_each</code> - 对每个元素执行操作</a></li>
+        <li><a href="#try_fold---可失败的折叠"><code>try_fold</code> - 可失败的折叠</a></li>
+        <li><a href="#try_for_each---可失败的遍历"><code>try_for_each</code> - 可失败的遍历</a></li>
+      </ul>
+    </li>
+    <li><a href="#组合示例">组合示例</a>
+      <ul>
+        <li><a href="#复杂链式调用">复杂链式调用</a></li>
+        <li><a href="#多重过滤和转换">多重过滤和转换</a></li>
+        <li><a href="#分组统计">分组统计</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="rust-迭代器适配器完整指南">Rust 迭代器适配器完整指南<a class="anchor" href="#rust-%e8%bf%ad%e4%bb%a3%e5%99%a8%e9%80%82%e9%85%8d%e5%99%a8%e5%ae%8c%e6%95%b4%e6%8c%87%e5%8d%97">#</a></h1>
+<h2 id="基础转换适配器">基础转换适配器<a class="anchor" href="#%e5%9f%ba%e7%a1%80%e8%bd%ac%e6%8d%a2%e9%80%82%e9%85%8d%e5%99%a8">#</a></h2>
+<h3 id="map---映射转换"><code>map</code> - 映射转换<a class="anchor" href="#map---%e6%98%a0%e5%b0%84%e8%bd%ac%e6%8d%a2">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> doubled: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().map(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [2, 4, 6]
+</span></span></span></code></pre></div><h3 id="filter---过滤元素"><code>filter</code> - 过滤元素<a class="anchor" href="#filter---%e8%bf%87%e6%bb%a4%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> evens: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().filter(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> <span style="color:#f92672">*</span>x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [2, 4]
+</span></span></span></code></pre></div><h3 id="filter_map---过滤并映射"><code>filter_map</code> - 过滤并映射<a class="anchor" href="#filter_map---%e8%bf%87%e6%bb%a4%e5%b9%b6%e6%98%a0%e5%b0%84">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> strs <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#34;1&#34;</span>, <span style="color:#e6db74">&#34;two&#34;</span>, <span style="color:#e6db74">&#34;3&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> strs.iter().filter_map(<span style="color:#f92672">|</span>s<span style="color:#f92672">|</span> s.parse::<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">&gt;</span>().ok()).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 3]
+</span></span></span></code></pre></div><h3 id="flat_map---扁平化映射"><code>flat_map</code> - 扁平化映射<a class="anchor" href="#flat_map---%e6%89%81%e5%b9%b3%e5%8c%96%e6%98%a0%e5%b0%84">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> words <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> chars: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> words.iter().flat_map(<span style="color:#f92672">|</span>s<span style="color:#f92672">|</span> s.chars()).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;, &#39;w&#39;, &#39;o&#39;, &#39;r&#39;, &#39;l&#39;, &#39;d&#39;]
+</span></span></span></code></pre></div><h3 id="flatten---扁平化嵌套"><code>flatten</code> - 扁平化嵌套<a class="anchor" href="#flatten---%e6%89%81%e5%b9%b3%e5%8c%96%e5%b5%8c%e5%a5%97">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nested <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>], <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>]];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> flat: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nested.into_iter().flatten().collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3, 4]
+</span></span></span></code></pre></div><h2 id="索引和枚举">索引和枚举<a class="anchor" href="#%e7%b4%a2%e5%bc%95%e5%92%8c%e6%9e%9a%e4%b8%be">#</a></h2>
+<h3 id="enumerate---添加索引"><code>enumerate</code> - 添加索引<a class="anchor" href="#enumerate---%e6%b7%bb%e5%8a%a0%e7%b4%a2%e5%bc%95">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> letters <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;c&#39;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> indexed: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> letters.iter().enumerate().collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [(0, &#39;a&#39;), (1, &#39;b&#39;), (2, &#39;c&#39;)]
+</span></span></span></code></pre></div><h3 id="zip---组合两个迭代器"><code>zip</code> - 组合两个迭代器<a class="anchor" href="#zip---%e7%bb%84%e5%90%88%e4%b8%a4%e4%b8%aa%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> letters <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#e6db74">&#39;b&#39;</span>, <span style="color:#e6db74">&#39;c&#39;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> pairs: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().zip(letters.iter()).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [(1, &#39;a&#39;), (2, &#39;b&#39;), (3, &#39;c&#39;)]
+</span></span></span></code></pre></div><h3 id="unzip---分离元组"><code>unzip</code> - 分离元组<a class="anchor" href="#unzip---%e5%88%86%e7%a6%bb%e5%85%83%e7%bb%84">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> pairs <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;a&#39;</span>), (<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;b&#39;</span>), (<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;c&#39;</span>)];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> (nums, letters): (Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span>, Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span>) <span style="color:#f92672">=</span> pairs.into_iter().unzip();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// nums: [1, 2, 3], letters: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]
+</span></span></span></code></pre></div><h2 id="跳过和获取">跳过和获取<a class="anchor" href="#%e8%b7%b3%e8%bf%87%e5%92%8c%e8%8e%b7%e5%8f%96">#</a></h2>
+<h3 id="take---获取前-n-个元素"><code>take</code> - 获取前 n 个元素<a class="anchor" href="#take---%e8%8e%b7%e5%8f%96%e5%89%8d-n-%e4%b8%aa%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> first_three: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().take(<span style="color:#ae81ff">3</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3]
+</span></span></span></code></pre></div><h3 id="take_while---获取直到条件不满足"><code>take_while</code> - 获取直到条件不满足<a class="anchor" href="#take_while---%e8%8e%b7%e5%8f%96%e7%9b%b4%e5%88%b0%e6%9d%a1%e4%bb%b6%e4%b8%8d%e6%bb%a1%e8%b6%b3">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().take_while(<span style="color:#f92672">|&amp;&amp;</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">4</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3]
+</span></span></span></code></pre></div><h3 id="skip---跳过前-n-个元素"><code>skip</code> - 跳过前 n 个元素<a class="anchor" href="#skip---%e8%b7%b3%e8%bf%87%e5%89%8d-n-%e4%b8%aa%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> last_two: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().skip(<span style="color:#ae81ff">3</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [4, 5]
+</span></span></span></code></pre></div><h3 id="skip_while---跳过直到条件不满足"><code>skip_while</code> - 跳过直到条件不满足<a class="anchor" href="#skip_while---%e8%b7%b3%e8%bf%87%e7%9b%b4%e5%88%b0%e6%9d%a1%e4%bb%b6%e4%b8%8d%e6%bb%a1%e8%b6%b3">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().skip_while(<span style="color:#f92672">|&amp;&amp;</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">3</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [3, 4, 1, 2]
+</span></span></span></code></pre></div><h3 id="step_by---按步长迭代"><code>step_by</code> - 按步长迭代<a class="anchor" href="#step_by---%e6%8c%89%e6%ad%a5%e9%95%bf%e8%bf%ad%e4%bb%a3">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().step_by(<span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [0, 2, 4]
+</span></span></span></code></pre></div><h2 id="链接和循环">链接和循环<a class="anchor" href="#%e9%93%be%e6%8e%a5%e5%92%8c%e5%be%aa%e7%8e%af">#</a></h2>
+<h3 id="chain---连接两个迭代器"><code>chain</code> - 连接两个迭代器<a class="anchor" href="#chain---%e8%bf%9e%e6%8e%a5%e4%b8%a4%e4%b8%aa%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> a <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> b <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> combined: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> a.iter().chain(b.iter()).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3, 4, 5, 6]
+</span></span></span></code></pre></div><h3 id="cycle---无限循环迭代器"><code>cycle</code> - 无限循环迭代器<a class="anchor" href="#cycle---%e6%97%a0%e9%99%90%e5%be%aa%e7%8e%af%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().cycle().take(<span style="color:#ae81ff">7</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3, 1, 2, 3, 1]
+</span></span></span></code></pre></div><h3 id="repeat---无限重复单个值"><code>repeat</code> - 无限重复单个值<a class="anchor" href="#repeat---%e6%97%a0%e9%99%90%e9%87%8d%e5%a4%8d%e5%8d%95%e4%b8%aa%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> std::iter::repeat(<span style="color:#ae81ff">5</span>).take(<span style="color:#ae81ff">3</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [5, 5, 5]
+</span></span></span></code></pre></div><h3 id="repeat_with---无限重复函数调用"><code>repeat_with</code> - 无限重复函数调用<a class="anchor" href="#repeat_with---%e6%97%a0%e9%99%90%e9%87%8d%e5%a4%8d%e5%87%bd%e6%95%b0%e8%b0%83%e7%94%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> std::iter::repeat_with(<span style="color:#f92672">||</span> { count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>; count }).take(<span style="color:#ae81ff">3</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3]
+</span></span></span></code></pre></div><h2 id="检查和查找">检查和查找<a class="anchor" href="#%e6%a3%80%e6%9f%a5%e5%92%8c%e6%9f%a5%e6%89%be">#</a></h2>
+<h3 id="inspect---检查每个元素调试用"><code>inspect</code> - 检查每个元素（调试用）<a class="anchor" href="#inspect---%e6%a3%80%e6%9f%a5%e6%af%8f%e4%b8%aa%e5%85%83%e7%b4%a0%e8%b0%83%e8%af%95%e7%94%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter()
+</span></span><span style="display:flex;"><span>    .inspect(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;处理: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, x))
+</span></span><span style="display:flex;"><span>    .map(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>    .collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 打印: 处理: 1, 处理: 2, 处理: 3
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 结果: [2, 4, 6]
+</span></span></span></code></pre></div><h3 id="find---查找第一个满足条件的元素"><code>find</code> - 查找第一个满足条件的元素<a class="anchor" href="#find---%e6%9f%a5%e6%89%be%e7%ac%ac%e4%b8%80%e4%b8%aa%e6%bb%a1%e8%b6%b3%e6%9d%a1%e4%bb%b6%e7%9a%84%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> first_even <span style="color:#f92672">=</span> nums.iter().find(<span style="color:#f92672">|&amp;&amp;</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;2)
+</span></span></span></code></pre></div><h3 id="position---查找第一个满足条件的位置"><code>position</code> - 查找第一个满足条件的位置<a class="anchor" href="#position---%e6%9f%a5%e6%89%be%e7%ac%ac%e4%b8%80%e4%b8%aa%e6%bb%a1%e8%b6%b3%e6%9d%a1%e4%bb%b6%e7%9a%84%e4%bd%8d%e7%bd%ae">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> pos <span style="color:#f92672">=</span> nums.iter().position(<span style="color:#f92672">|&amp;</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">==</span> <span style="color:#ae81ff">3</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(2)
+</span></span></span></code></pre></div><h3 id="rposition---从后向前查找位置"><code>rposition</code> - 从后向前查找位置<a class="anchor" href="#rposition---%e4%bb%8e%e5%90%8e%e5%90%91%e5%89%8d%e6%9f%a5%e6%89%be%e4%bd%8d%e7%bd%ae">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> pos <span style="color:#f92672">=</span> nums.iter().rposition(<span style="color:#f92672">|&amp;</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(3)
+</span></span></span></code></pre></div><h2 id="分区和分组">分区和分组<a class="anchor" href="#%e5%88%86%e5%8c%ba%e5%92%8c%e5%88%86%e7%bb%84">#</a></h2>
+<h3 id="partition---按条件分成两组"><code>partition</code> - 按条件分成两组<a class="anchor" href="#partition---%e6%8c%89%e6%9d%a1%e4%bb%b6%e5%88%86%e6%88%90%e4%b8%a4%e7%bb%84">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> (evens, odds): (Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span>, Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span>) <span style="color:#f92672">=</span> nums.into_iter().partition(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// evens: [2, 4], odds: [1, 3, 5]
+</span></span></span></code></pre></div><h3 id="fold---折叠累积"><code>fold</code> - 折叠（累积）<a class="anchor" href="#fold---%e6%8a%98%e5%8f%a0%e7%b4%af%e7%a7%af">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> sum <span style="color:#f92672">=</span> nums.iter().fold(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">|</span>acc, x<span style="color:#f92672">|</span> acc <span style="color:#f92672">+</span> x);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 10
+</span></span></span></code></pre></div><h3 id="reduce---归约无初始值"><code>reduce</code> - 归约（无初始值）<a class="anchor" href="#reduce---%e5%bd%92%e7%ba%a6%e6%97%a0%e5%88%9d%e5%a7%8b%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> product <span style="color:#f92672">=</span> nums.iter().reduce(<span style="color:#f92672">|</span>acc, x<span style="color:#f92672">|</span> acc <span style="color:#f92672">*</span> x);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(24)
+</span></span></span></code></pre></div><h3 id="scan---有状态的映射"><code>scan</code> - 有状态的映射<a class="anchor" href="#scan---%e6%9c%89%e7%8a%b6%e6%80%81%e7%9a%84%e6%98%a0%e5%b0%84">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> running_sum: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().scan(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">|</span>state, x<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>state <span style="color:#f92672">+=</span> x;
+</span></span><span style="display:flex;"><span>    Some(<span style="color:#f92672">*</span>state)
+</span></span><span style="display:flex;"><span>}).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 3, 6, 10]
+</span></span></span></code></pre></div><h2 id="反转和排序">反转和排序<a class="anchor" href="#%e5%8f%8d%e8%bd%ac%e5%92%8c%e6%8e%92%e5%ba%8f">#</a></h2>
+<h3 id="rev---反转迭代器"><code>rev</code> - 反转迭代器<a class="anchor" href="#rev---%e5%8f%8d%e8%bd%ac%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> reversed: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().rev().collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [3, 2, 1]
+</span></span></span></code></pre></div><h3 id="copied---复制引用的值"><code>copied</code> - 复制引用的值<a class="anchor" href="#copied---%e5%a4%8d%e5%88%b6%e5%bc%95%e7%94%a8%e7%9a%84%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> copied: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().copied().collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [1, 2, 3] (拥有所有权)
+</span></span></span></code></pre></div><h3 id="cloned---克隆引用的值"><code>cloned</code> - 克隆引用的值<a class="anchor" href="#cloned---%e5%85%8b%e9%9a%86%e5%bc%95%e7%94%a8%e7%9a%84%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> strings <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[String::from(<span style="color:#e6db74">&#34;a&#34;</span>), String::from(<span style="color:#e6db74">&#34;b&#34;</span>)];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> cloned: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> strings.iter().cloned().collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [String(&#34;a&#34;), String(&#34;b&#34;)]
+</span></span></span></code></pre></div><h2 id="窗口和分块">窗口和分块<a class="anchor" href="#%e7%aa%97%e5%8f%a3%e5%92%8c%e5%88%86%e5%9d%97">#</a></h2>
+<h3 id="windows---滑动窗口"><code>windows</code> - 滑动窗口<a class="anchor" href="#windows---%e6%bb%91%e5%8a%a8%e7%aa%97%e5%8f%a3">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> windows: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.windows(<span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [[1, 2], [2, 3], [3, 4]]
+</span></span></span></code></pre></div><h3 id="chunks---固定大小分块"><code>chunks</code> - 固定大小分块<a class="anchor" href="#chunks---%e5%9b%ba%e5%ae%9a%e5%a4%a7%e5%b0%8f%e5%88%86%e5%9d%97">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> chunks: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.chunks(<span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [[1, 2], [3, 4], [5]]
+</span></span></span></code></pre></div><h3 id="chunks_exact---精确大小分块"><code>chunks_exact</code> - 精确大小分块<a class="anchor" href="#chunks_exact---%e7%b2%be%e7%a1%ae%e5%a4%a7%e5%b0%8f%e5%88%86%e5%9d%97">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> chunks: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.chunks_exact(<span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [[1, 2], [3, 4]] (不包含 [5])
+</span></span></span></code></pre></div><h3 id="rchunks---从后向前分块"><code>rchunks</code> - 从后向前分块<a class="anchor" href="#rchunks---%e4%bb%8e%e5%90%8e%e5%90%91%e5%89%8d%e5%88%86%e5%9d%97">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> chunks: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.rchunks(<span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [[4, 5], [2, 3], [1]]
+</span></span></span></code></pre></div><h2 id="比较和判断">比较和判断<a class="anchor" href="#%e6%af%94%e8%be%83%e5%92%8c%e5%88%a4%e6%96%ad">#</a></h2>
+<h3 id="all---所有元素都满足条件"><code>all</code> - 所有元素都满足条件<a class="anchor" href="#all---%e6%89%80%e6%9c%89%e5%85%83%e7%b4%a0%e9%83%bd%e6%bb%a1%e8%b6%b3%e6%9d%a1%e4%bb%b6">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">6</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> all_even <span style="color:#f92672">=</span> nums.iter().all(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// true
+</span></span></span></code></pre></div><h3 id="any---任意元素满足条件"><code>any</code> - 任意元素满足条件<a class="anchor" href="#any---%e4%bb%bb%e6%84%8f%e5%85%83%e7%b4%a0%e6%bb%a1%e8%b6%b3%e6%9d%a1%e4%bb%b6">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> has_even <span style="color:#f92672">=</span> nums.iter().any(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// true
+</span></span></span></code></pre></div><h3 id="eq---比较两个迭代器是否相等"><code>eq</code> - 比较两个迭代器是否相等<a class="anchor" href="#eq---%e6%af%94%e8%be%83%e4%b8%a4%e4%b8%aa%e8%bf%ad%e4%bb%a3%e5%99%a8%e6%98%af%e5%90%a6%e7%9b%b8%e7%ad%89">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> a <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> b <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> equal <span style="color:#f92672">=</span> a.iter().eq(b.iter());
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// true
+</span></span></span></code></pre></div><h3 id="ne---比较两个迭代器是否不等"><code>ne</code> - 比较两个迭代器是否不等<a class="anchor" href="#ne---%e6%af%94%e8%be%83%e4%b8%a4%e4%b8%aa%e8%bf%ad%e4%bb%a3%e5%99%a8%e6%98%af%e5%90%a6%e4%b8%8d%e7%ad%89">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> a <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> b <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> not_equal <span style="color:#f92672">=</span> a.iter().ne(b.iter());
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// true
+</span></span></span></code></pre></div><h3 id="lt--le--gt--ge---字典序比较"><code>lt</code> / <code>le</code> / <code>gt</code> / <code>ge</code> - 字典序比较<a class="anchor" href="#lt--le--gt--ge---%e5%ad%97%e5%85%b8%e5%ba%8f%e6%af%94%e8%be%83">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> a <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> b <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> less <span style="color:#f92672">=</span> a.iter().lt(b.iter());
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// true
+</span></span></span></code></pre></div><h2 id="计数和统计">计数和统计<a class="anchor" href="#%e8%ae%a1%e6%95%b0%e5%92%8c%e7%bb%9f%e8%ae%a1">#</a></h2>
+<h3 id="count---计数元素个数"><code>count</code> - 计数元素个数<a class="anchor" href="#count---%e8%ae%a1%e6%95%b0%e5%85%83%e7%b4%a0%e4%b8%aa%e6%95%b0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> count <span style="color:#f92672">=</span> nums.iter().count();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 5
+</span></span></span></code></pre></div><h3 id="sum---求和"><code>sum</code> - 求和<a class="anchor" href="#sum---%e6%b1%82%e5%92%8c">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> total: <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> nums.iter().sum();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 10
+</span></span></span></code></pre></div><h3 id="product---求积"><code>product</code> - 求积<a class="anchor" href="#product---%e6%b1%82%e7%a7%af">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> nums.iter().product();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 24
+</span></span></span></code></pre></div><h2 id="最值查找">最值查找<a class="anchor" href="#%e6%9c%80%e5%80%bc%e6%9f%a5%e6%89%be">#</a></h2>
+<h3 id="max---查找最大值"><code>max</code> - 查找最大值<a class="anchor" href="#max---%e6%9f%a5%e6%89%be%e6%9c%80%e5%a4%a7%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">2</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> max <span style="color:#f92672">=</span> nums.iter().max();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;5)
+</span></span></span></code></pre></div><h3 id="min---查找最小值"><code>min</code> - 查找最小值<a class="anchor" href="#min---%e6%9f%a5%e6%89%be%e6%9c%80%e5%b0%8f%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">2</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> min <span style="color:#f92672">=</span> nums.iter().min();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;1)
+</span></span></span></code></pre></div><h3 id="max_by---按比较器查找最大值"><code>max_by</code> - 按比较器查找最大值<a class="anchor" href="#max_by---%e6%8c%89%e6%af%94%e8%be%83%e5%99%a8%e6%9f%a5%e6%89%be%e6%9c%80%e5%a4%a7%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">2</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> max <span style="color:#f92672">=</span> nums.iter().max_by(<span style="color:#f92672">|</span>a, b<span style="color:#f92672">|</span> a.abs().cmp(<span style="color:#f92672">&amp;</span>b.abs()));
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;-10)
+</span></span></span></code></pre></div><h3 id="min_by---按比较器查找最小值"><code>min_by</code> - 按比较器查找最小值<a class="anchor" href="#min_by---%e6%8c%89%e6%af%94%e8%be%83%e5%99%a8%e6%9f%a5%e6%89%be%e6%9c%80%e5%b0%8f%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">2</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> min <span style="color:#f92672">=</span> nums.iter().min_by(<span style="color:#f92672">|</span>a, b<span style="color:#f92672">|</span> a.abs().cmp(<span style="color:#f92672">&amp;</span>b.abs()));
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;2)
+</span></span></span></code></pre></div><h3 id="max_by_key---按键函数查找最大值"><code>max_by_key</code> - 按键函数查找最大值<a class="anchor" href="#max_by_key---%e6%8c%89%e9%94%ae%e5%87%bd%e6%95%b0%e6%9f%a5%e6%89%be%e6%9c%80%e5%a4%a7%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> words <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;bbb&#34;</span>, <span style="color:#e6db74">&#34;cc&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> longest <span style="color:#f92672">=</span> words.iter().max_by_key(<span style="color:#f92672">|</span>s<span style="color:#f92672">|</span> s.len());
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;&#34;bbb&#34;)
+</span></span></span></code></pre></div><h3 id="min_by_key---按键函数查找最小值"><code>min_by_key</code> - 按键函数查找最小值<a class="anchor" href="#min_by_key---%e6%8c%89%e9%94%ae%e5%87%bd%e6%95%b0%e6%9f%a5%e6%89%be%e6%9c%80%e5%b0%8f%e5%80%bc">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> words <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;bbb&#34;</span>, <span style="color:#e6db74">&#34;cc&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> shortest <span style="color:#f92672">=</span> words.iter().min_by_key(<span style="color:#f92672">|</span>s<span style="color:#f92672">|</span> s.len());
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;&#34;a&#34;)
+</span></span></span></code></pre></div><h2 id="特殊操作">特殊操作<a class="anchor" href="#%e7%89%b9%e6%ae%8a%e6%93%8d%e4%bd%9c">#</a></h2>
+<h3 id="nth---获取第-n-个元素"><code>nth</code> - 获取第 n 个元素<a class="anchor" href="#nth---%e8%8e%b7%e5%8f%96%e7%ac%ac-n-%e4%b8%aa%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> third <span style="color:#f92672">=</span> nums.iter().nth(<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;3)
+</span></span></span></code></pre></div><h3 id="last---获取最后一个元素"><code>last</code> - 获取最后一个元素<a class="anchor" href="#last---%e8%8e%b7%e5%8f%96%e6%9c%80%e5%90%8e%e4%b8%80%e4%b8%aa%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> last <span style="color:#f92672">=</span> nums.iter().last();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Some(&amp;3)
+</span></span></span></code></pre></div><h3 id="peekable---可预览下一个元素"><code>peekable</code> - 可预览下一个元素<a class="anchor" href="#peekable---%e5%8f%af%e9%a2%84%e8%a7%88%e4%b8%8b%e4%b8%80%e4%b8%aa%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iter <span style="color:#f92672">=</span> nums.iter().peekable();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">assert_eq!</span>(iter.peek(), Some(<span style="color:#f92672">&amp;&amp;</span><span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">assert_eq!</span>(iter.next(), Some(<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">1</span>));</span></span></code></pre></div><h3 id="fuse---确保迭代器结束后不再产生元素"><code>fuse</code> - 确保迭代器结束后不再产生元素<a class="anchor" href="#fuse---%e7%a1%ae%e4%bf%9d%e8%bf%ad%e4%bb%a3%e5%99%a8%e7%bb%93%e6%9d%9f%e5%90%8e%e4%b8%8d%e5%86%8d%e4%ba%a7%e7%94%9f%e5%85%83%e7%b4%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iter <span style="color:#f92672">=</span> nums.iter().fuse();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 即使多次调用 next()，结束后始终返回 None
+</span></span></span></code></pre></div><h3 id="by_ref---借用迭代器"><code>by_ref</code> - 借用迭代器<a class="anchor" href="#by_ref---%e5%80%9f%e7%94%a8%e8%bf%ad%e4%bb%a3%e5%99%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iter <span style="color:#f92672">=</span> nums.iter();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> first_two: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> iter.by_ref().take(<span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> rest: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> iter.collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// first_two: [1, 2], rest: [3, 4, 5]
+</span></span></span></code></pre></div><h2 id="收集和消费">收集和消费<a class="anchor" href="#%e6%94%b6%e9%9b%86%e5%92%8c%e6%b6%88%e8%b4%b9">#</a></h2>
+<h3 id="collect---收集到集合"><code>collect</code> - 收集到集合<a class="anchor" href="#collect---%e6%94%b6%e9%9b%86%e5%88%b0%e9%9b%86%e5%90%88">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> doubled: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().map(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>).collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [2, 4, 6]
+</span></span></span></code></pre></div><h3 id="for_each---对每个元素执行操作"><code>for_each</code> - 对每个元素执行操作<a class="anchor" href="#for_each---%e5%af%b9%e6%af%8f%e4%b8%aa%e5%85%83%e7%b4%a0%e6%89%a7%e8%a1%8c%e6%93%8d%e4%bd%9c">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span>nums.iter().for_each(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, x));
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 打印: 1, 2, 3
+</span></span></span></code></pre></div><h3 id="try_fold---可失败的折叠"><code>try_fold</code> - 可失败的折叠<a class="anchor" href="#try_fold---%e5%8f%af%e5%a4%b1%e8%b4%a5%e7%9a%84%e6%8a%98%e5%8f%a0">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Result<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">i32</span>, <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().try_fold(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">|</span>acc, <span style="color:#f92672">&amp;</span>x<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> { Ok(acc <span style="color:#f92672">+</span> x) } <span style="color:#66d9ef">else</span> { Err(<span style="color:#e6db74">&#34;负数&#34;</span>) }
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Ok(6)
+</span></span></span></code></pre></div><h3 id="try_for_each---可失败的遍历"><code>try_for_each</code> - 可失败的遍历<a class="anchor" href="#try_for_each---%e5%8f%af%e5%a4%b1%e8%b4%a5%e7%9a%84%e9%81%8d%e5%8e%86">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> nums <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Result<span style="color:#f92672">&lt;</span>(), <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> nums.iter().try_for_each(<span style="color:#f92672">|&amp;</span>x<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> { Ok(()) } <span style="color:#66d9ef">else</span> { Err(<span style="color:#e6db74">&#34;负数&#34;</span>) }
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Ok(())
+</span></span></span></code></pre></div><h2 id="组合示例">组合示例<a class="anchor" href="#%e7%bb%84%e5%90%88%e7%a4%ba%e4%be%8b">#</a></h2>
+<h3 id="复杂链式调用">复杂链式调用<a class="anchor" href="#%e5%a4%8d%e6%9d%82%e9%93%be%e5%bc%8f%e8%b0%83%e7%94%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: <span style="color:#66d9ef">i32</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span><span style="color:#f92672">..=</span><span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>    .filter(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)      <span style="color:#75715e">// 偶数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .map(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">*</span> x)               <span style="color:#75715e">// 平方
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .take(<span style="color:#ae81ff">3</span>)                      <span style="color:#75715e">// 前3个
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    .sum();                       <span style="color:#75715e">// 求和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// 2² + 4² + 6² = 4 + 16 + 36 = 56
+</span></span></span></code></pre></div><h3 id="多重过滤和转换">多重过滤和转换<a class="anchor" href="#%e5%a4%9a%e9%87%8d%e8%bf%87%e6%bb%a4%e5%92%8c%e8%bd%ac%e6%8d%a2">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> words <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>, <span style="color:#e6db74">&#34;rust&#34;</span>, <span style="color:#e6db74">&#34;programming&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> result: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> words.iter()
+</span></span><span style="display:flex;"><span>    .filter(<span style="color:#f92672">|</span>s<span style="color:#f92672">|</span> s.len() <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>    .map(<span style="color:#f92672">|</span>s<span style="color:#f92672">|</span> s.to_uppercase())
+</span></span><span style="display:flex;"><span>    .collect();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// [&#34;HELLO&#34;, &#34;WORLD&#34;, &#34;PROGRAMMING&#34;]
+</span></span></span></code></pre></div><h3 id="分组统计">分组统计<a class="anchor" href="#%e5%88%86%e7%bb%84%e7%bb%9f%e8%ae%a1">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::collections::HashMap;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> words <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#34;apple&#34;</span>, <span style="color:#e6db74">&#34;banana&#34;</span>, <span style="color:#e6db74">&#34;apricot&#34;</span>, <span style="color:#e6db74">&#34;blueberry&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> grouped: <span style="color:#a6e22e">HashMap</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">char</span>, Vec<span style="color:#f92672">&lt;&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">=</span> words.iter()
+</span></span><span style="display:flex;"><span>    .fold(HashMap::new(), <span style="color:#f92672">|</span><span style="color:#66d9ef">mut</span> acc, word<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>        acc.entry(word.chars().next().unwrap())
+</span></span><span style="display:flex;"><span>           .or_insert_with(Vec::new)
+</span></span><span style="display:flex;"><span>           .push(word);
+</span></span><span style="display:flex;"><span>        acc
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// {&#39;a&#39;: [&#34;apple&#34;, &#34;apricot&#34;], &#39;b&#39;: [&#34;banana&#34;, &#34;blueberry&#34;]}
+</span></span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Lifetime</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/medical_imaging/" class="flex align-center">
+        <span>Medical Imaging</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#基础转换适配器">基础转换适配器</a>
+      <ul>
+        <li><a href="#map---映射转换"><code>map</code> - 映射转换</a></li>
+        <li><a href="#filter---过滤元素"><code>filter</code> - 过滤元素</a></li>
+        <li><a href="#filter_map---过滤并映射"><code>filter_map</code> - 过滤并映射</a></li>
+        <li><a href="#flat_map---扁平化映射"><code>flat_map</code> - 扁平化映射</a></li>
+        <li><a href="#flatten---扁平化嵌套"><code>flatten</code> - 扁平化嵌套</a></li>
+      </ul>
+    </li>
+    <li><a href="#索引和枚举">索引和枚举</a>
+      <ul>
+        <li><a href="#enumerate---添加索引"><code>enumerate</code> - 添加索引</a></li>
+        <li><a href="#zip---组合两个迭代器"><code>zip</code> - 组合两个迭代器</a></li>
+        <li><a href="#unzip---分离元组"><code>unzip</code> - 分离元组</a></li>
+      </ul>
+    </li>
+    <li><a href="#跳过和获取">跳过和获取</a>
+      <ul>
+        <li><a href="#take---获取前-n-个元素"><code>take</code> - 获取前 n 个元素</a></li>
+        <li><a href="#take_while---获取直到条件不满足"><code>take_while</code> - 获取直到条件不满足</a></li>
+        <li><a href="#skip---跳过前-n-个元素"><code>skip</code> - 跳过前 n 个元素</a></li>
+        <li><a href="#skip_while---跳过直到条件不满足"><code>skip_while</code> - 跳过直到条件不满足</a></li>
+        <li><a href="#step_by---按步长迭代"><code>step_by</code> - 按步长迭代</a></li>
+      </ul>
+    </li>
+    <li><a href="#链接和循环">链接和循环</a>
+      <ul>
+        <li><a href="#chain---连接两个迭代器"><code>chain</code> - 连接两个迭代器</a></li>
+        <li><a href="#cycle---无限循环迭代器"><code>cycle</code> - 无限循环迭代器</a></li>
+        <li><a href="#repeat---无限重复单个值"><code>repeat</code> - 无限重复单个值</a></li>
+        <li><a href="#repeat_with---无限重复函数调用"><code>repeat_with</code> - 无限重复函数调用</a></li>
+      </ul>
+    </li>
+    <li><a href="#检查和查找">检查和查找</a>
+      <ul>
+        <li><a href="#inspect---检查每个元素调试用"><code>inspect</code> - 检查每个元素（调试用）</a></li>
+        <li><a href="#find---查找第一个满足条件的元素"><code>find</code> - 查找第一个满足条件的元素</a></li>
+        <li><a href="#position---查找第一个满足条件的位置"><code>position</code> - 查找第一个满足条件的位置</a></li>
+        <li><a href="#rposition---从后向前查找位置"><code>rposition</code> - 从后向前查找位置</a></li>
+      </ul>
+    </li>
+    <li><a href="#分区和分组">分区和分组</a>
+      <ul>
+        <li><a href="#partition---按条件分成两组"><code>partition</code> - 按条件分成两组</a></li>
+        <li><a href="#fold---折叠累积"><code>fold</code> - 折叠（累积）</a></li>
+        <li><a href="#reduce---归约无初始值"><code>reduce</code> - 归约（无初始值）</a></li>
+        <li><a href="#scan---有状态的映射"><code>scan</code> - 有状态的映射</a></li>
+      </ul>
+    </li>
+    <li><a href="#反转和排序">反转和排序</a>
+      <ul>
+        <li><a href="#rev---反转迭代器"><code>rev</code> - 反转迭代器</a></li>
+        <li><a href="#copied---复制引用的值"><code>copied</code> - 复制引用的值</a></li>
+        <li><a href="#cloned---克隆引用的值"><code>cloned</code> - 克隆引用的值</a></li>
+      </ul>
+    </li>
+    <li><a href="#窗口和分块">窗口和分块</a>
+      <ul>
+        <li><a href="#windows---滑动窗口"><code>windows</code> - 滑动窗口</a></li>
+        <li><a href="#chunks---固定大小分块"><code>chunks</code> - 固定大小分块</a></li>
+        <li><a href="#chunks_exact---精确大小分块"><code>chunks_exact</code> - 精确大小分块</a></li>
+        <li><a href="#rchunks---从后向前分块"><code>rchunks</code> - 从后向前分块</a></li>
+      </ul>
+    </li>
+    <li><a href="#比较和判断">比较和判断</a>
+      <ul>
+        <li><a href="#all---所有元素都满足条件"><code>all</code> - 所有元素都满足条件</a></li>
+        <li><a href="#any---任意元素满足条件"><code>any</code> - 任意元素满足条件</a></li>
+        <li><a href="#eq---比较两个迭代器是否相等"><code>eq</code> - 比较两个迭代器是否相等</a></li>
+        <li><a href="#ne---比较两个迭代器是否不等"><code>ne</code> - 比较两个迭代器是否不等</a></li>
+        <li><a href="#lt--le--gt--ge---字典序比较"><code>lt</code> / <code>le</code> / <code>gt</code> / <code>ge</code> - 字典序比较</a></li>
+      </ul>
+    </li>
+    <li><a href="#计数和统计">计数和统计</a>
+      <ul>
+        <li><a href="#count---计数元素个数"><code>count</code> - 计数元素个数</a></li>
+        <li><a href="#sum---求和"><code>sum</code> - 求和</a></li>
+        <li><a href="#product---求积"><code>product</code> - 求积</a></li>
+      </ul>
+    </li>
+    <li><a href="#最值查找">最值查找</a>
+      <ul>
+        <li><a href="#max---查找最大值"><code>max</code> - 查找最大值</a></li>
+        <li><a href="#min---查找最小值"><code>min</code> - 查找最小值</a></li>
+        <li><a href="#max_by---按比较器查找最大值"><code>max_by</code> - 按比较器查找最大值</a></li>
+        <li><a href="#min_by---按比较器查找最小值"><code>min_by</code> - 按比较器查找最小值</a></li>
+        <li><a href="#max_by_key---按键函数查找最大值"><code>max_by_key</code> - 按键函数查找最大值</a></li>
+        <li><a href="#min_by_key---按键函数查找最小值"><code>min_by_key</code> - 按键函数查找最小值</a></li>
+      </ul>
+    </li>
+    <li><a href="#特殊操作">特殊操作</a>
+      <ul>
+        <li><a href="#nth---获取第-n-个元素"><code>nth</code> - 获取第 n 个元素</a></li>
+        <li><a href="#last---获取最后一个元素"><code>last</code> - 获取最后一个元素</a></li>
+        <li><a href="#peekable---可预览下一个元素"><code>peekable</code> - 可预览下一个元素</a></li>
+        <li><a href="#fuse---确保迭代器结束后不再产生元素"><code>fuse</code> - 确保迭代器结束后不再产生元素</a></li>
+        <li><a href="#by_ref---借用迭代器"><code>by_ref</code> - 借用迭代器</a></li>
+      </ul>
+    </li>
+    <li><a href="#收集和消费">收集和消费</a>
+      <ul>
+        <li><a href="#collect---收集到集合"><code>collect</code> - 收集到集合</a></li>
+        <li><a href="#for_each---对每个元素执行操作"><code>for_each</code> - 对每个元素执行操作</a></li>
+        <li><a href="#try_fold---可失败的折叠"><code>try_fold</code> - 可失败的折叠</a></li>
+        <li><a href="#try_for_each---可失败的遍历"><code>try_for_each</code> - 可失败的遍历</a></li>
+      </ul>
+    </li>
+    <li><a href="#组合示例">组合示例</a>
+      <ul>
+        <li><a href="#复杂链式调用">复杂链式调用</a></li>
+        <li><a href="#多重过滤和转换">多重过滤和转换</a></li>
+        <li><a href="#分组统计">分组统计</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
