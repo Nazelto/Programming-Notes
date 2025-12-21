@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rust Cell、RefCell、unsafeCell#使用时机#在结构体的状态不变，但是需要内部属性改变时。
+Cell#struct Temp&lt;T&gt; where T:Copy { cache:Cell&lt;T&gt; }Cell需要实现了Copy Trait的数据结构才能调用其get()方法。
+struct Temp { cache:Cell&lt;HashMap&lt;int,int&gt;&gt; }而向上面HashMap没有实现Copy Trait可以使用take。
+Cell最好不要获取引用
+获取引用最好使用RefCell
+RefCell#struct Temp { cache:RefCell&lt;HashMap&lt;int,int&gt;&gt; }RefCell会将编译时进行的引用检查延迟到运行时，如果运行时发生引用错误则会panic。
+由于RefCell内部通过维持一个引用计数在运行时进行引用检查，所以会导致一些性能损失。
+如果不希望有这些性能损失可以使用unsafeCell
+unsafeCell#struct Temp { cache:UnsafeCell&lt;HashMap&lt;int,int&gt;&gt; }通过指针操作可变性。所有的操作都是unsafe的。
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="Rust Cell、RefCell、unsafeCell#使用时机#在结构体的状态不变，但是需要内部属性改变时。
+Cell#struct Temp&lt;T&gt; where T:Copy { cache:Cell&lt;T&gt; }Cell需要实现了Copy Trait的数据结构才能调用其get()方法。
+struct Temp { cache:Cell&lt;HashMap&lt;int,int&gt;&gt; }而向上面HashMap没有实现Copy Trait可以使用take。
+Cell最好不要获取引用
+获取引用最好使用RefCell
+RefCell#struct Temp { cache:RefCell&lt;HashMap&lt;int,int&gt;&gt; }RefCell会将编译时进行的引用检查延迟到运行时，如果运行时发生引用错误则会panic。
+由于RefCell内部通过维持一个引用计数在运行时进行引用检查，所以会导致一些性能损失。
+如果不希望有这些性能损失可以使用unsafeCell
+unsafeCell#struct Temp { cache:UnsafeCell&lt;HashMap&lt;int,int&gt;&gt; }通过指针操作可变性。所有的操作都是unsafe的。">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="Rust Cell、RefCell、unsafeCell#使用时机#在结构体的状态不变，但是需要内部属性改变时。
+Cell#struct Temp&lt;T&gt; where T:Copy { cache:Cell&lt;T&gt; }Cell需要实现了Copy Trait的数据结构才能调用其get()方法。
+struct Temp { cache:Cell&lt;HashMap&lt;int,int&gt;&gt; }而向上面HashMap没有实现Copy Trait可以使用take。
+Cell最好不要获取引用
+获取引用最好使用RefCell
+RefCell#struct Temp { cache:RefCell&lt;HashMap&lt;int,int&gt;&gt; }RefCell会将编译时进行的引用检查延迟到运行时，如果运行时发生引用错误则会panic。
+由于RefCell内部通过维持一个引用计数在运行时进行引用检查，所以会导致一些性能损失。
+如果不希望有这些性能损失可以使用unsafeCell
+unsafeCell#struct Temp { cache:UnsafeCell&lt;HashMap&lt;int,int&gt;&gt; }通过指针操作可变性。所有的操作都是unsafe的。">
+  <meta itemprop="wordCount" content="35">
+
+<title>内部可变性 | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.b34fbb886dc5a4f7e6990bbc0b3113a90dbf29090d2a78d4c6d369bab853a573.js" integrity="sha256-s0&#43;7iG3FpPfmmQu8CzETqQ2/KQkNKnjUxtNpurhTpXM=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle" checked />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="">
+      Rust Algorithm</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="">
+      Rust Iterator Adapters</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/" class="active">
+      内部可变性</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/medical_imaging/" class="">
+      Medical Imaging</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>内部可变性</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#rust-cellrefcellunsafecell">Rust Cell、RefCell、unsafeCell</a>
+      <ul>
+        <li><a href="#使用时机">使用时机</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h2 id="rust-cellrefcellunsafecell">Rust Cell、RefCell、unsafeCell<a class="anchor" href="#rust-cellrefcellunsafecell">#</a></h2>
+<h3 id="使用时机">使用时机<a class="anchor" href="#%e4%bd%bf%e7%94%a8%e6%97%b6%e6%9c%ba">#</a></h3>
+<p>在结构体的状态不变，但是需要内部属性改变时。</p>
+<h4 id="cell">Cell<a class="anchor" href="#cell">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Temp</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span>
+</span></span><span style="display:flex;"><span>T:Copy 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    cache:<span style="color:#a6e22e">Cell</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><p><code>Cell</code>需要实现了<code>Copy Trait</code>的数据结构才能调用其<code>get()</code>方法。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Temp</span> {
+</span></span><span style="display:flex;"><span>    cache:<span style="color:#a6e22e">Cell</span><span style="color:#f92672">&lt;</span>HashMap<span style="color:#f92672">&lt;</span>int,int<span style="color:#f92672">&gt;&gt;</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><p>而向上面<code>HashMap</code>没有实现<code>Copy Trait</code>可以使用<code>take</code>。</p>
+<blockquote class='book-hint tip'>
+<p><code>Cell</code>最好不要获取引用<br>
+获取引用最好使用<code>RefCell</code></p></blockquote><h4 id="refcell">RefCell<a class="anchor" href="#refcell">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Temp</span> {
+</span></span><span style="display:flex;"><span>    cache:<span style="color:#a6e22e">RefCell</span><span style="color:#f92672">&lt;</span>HashMap<span style="color:#f92672">&lt;</span>int,int<span style="color:#f92672">&gt;&gt;</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><p><code>RefCell</code>会将编译时进行的引用检查延迟到运行时，如果运行时发生引用错误则会<code>panic</code>。</p>
+<blockquote class='book-hint tip'>
+<p>由于<code>RefCell</code>内部通过维持一个引用计数在运行时进行引用检查，所以会导致一些性能损失。<br>
+如果不希望有这些性能损失可以使用<code>unsafeCell</code></p></blockquote><h4 id="unsafecell">unsafeCell<a class="anchor" href="#unsafecell">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Temp</span> {
+</span></span><span style="display:flex;"><span>    cache:<span style="color:#a6e22e">UnsafeCell</span><span style="color:#f92672">&lt;</span>HashMap<span style="color:#f92672">&lt;</span>int,int<span style="color:#f92672">&gt;&gt;</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><p>通过指针操作可变性。所有的操作都是<code>unsafe</code>的。</p>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Rust Iterator Adapters</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/medical_imaging/" class="flex align-center">
+        <span>Medical Imaging</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#rust-cellrefcellunsafecell">Rust Cell、RefCell、unsafeCell</a>
+      <ul>
+        <li><a href="#使用时机">使用时机</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
