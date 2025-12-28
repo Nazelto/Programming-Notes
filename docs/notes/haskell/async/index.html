@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Haskell Async 库详解#概述#Async 是 Haskell 中用于并发编程的核心库，提供了类型安全的异步操作管理，允许开发者以声明式风格编写并发代码。
+核心概念#Async 类型#data Async a = Async { asyncThreadId :: ThreadId, -- 其他内部字段 }表示一个正在进行的异步计算，最终会产生一个 a 类型的值。
+主要功能#启动异步任务#-- 基本异步操作 async :: IO a -&gt; IO (Async a) -- 带资源管理的异步 withAsync :: IO a -&gt; (Async a -&gt; IO b) -&gt; IO b -- 在特定CPU核心上运行 asyncOn :: Int -&gt; IO a -&gt; IO (Async a)等待结果#-- 阻塞等待结果 wait :: Async a -&gt; IO a -- 等待并捕获异常 waitCatch :: Async a -&gt; IO (Either SomeException a) -- 等待任意一个完成 waitAny :: [Async a] -&gt; IO (Async a, [Async a]) -- 等待全部完成 waitBoth :: Async a -&gt; Async b -&gt; IO (a, b)组合操作#-- 竞争：返回先完成的结果 race :: IO a -&gt; IO b -&gt; IO (Either a b) -- 并发执行两个操作 concurrently :: IO a -&gt; IO b -&gt; IO (a, b) -- 并发执行多个相同操作 replicateConcurrently :: Int -&gt; IO a -&gt; IO [a]遍历并发#-- 并发遍历列表 mapConcurrently :: Traversable t =&gt; (a -&gt; IO b) -&gt; t a -&gt; IO (t b) -- 并发循环 forConcurrently :: Traversable t =&gt; t a -&gt; (a -&gt; IO b) -&gt; IO (t b) -- 限制并发数 mapConcurrentlyN :: Int -&gt; (a -&gt; IO b) -&gt; [a] -&gt; IO [b]实用示例#基本使用#import Control.Concurrent.Async import Control.Concurrent (threadDelay) main :: IO () main = do -- 启动两个异步任务 a1 &lt;- async $ do threadDelay 1000000 return &#34;Task 1 done&#34; a2 &lt;- async $ do threadDelay 2000000 return &#34;Task 2 done&#34; -- 等待两个任务完成 r1 &lt;- wait a1 r2 &lt;- wait a2 putStrLn $ r1 &#43;&#43; &#34;, &#34; &#43;&#43; r2withAsync 自动清理#main :: IO () main = do -- withAsync 确保资源被正确释放 withAsync (longRunningTask &#34;Task1&#34;) $ \a1 -&gt; withAsync (longRunningTask &#34;Task2&#34;) $ \a2 -&gt; do r1 &lt;- wait a1 r2 &lt;- wait a2 print (r1, r2) where longRunningTask name = do threadDelay 500000 return name并发 Web 请求#import Control.Concurrent.Async import Network.HTTP.Simple import qualified Data.ByteString.Char8 as B fetchUrls :: [String] -&gt; IO [B.ByteString] fetchUrls urls = do -- 并发获取多个URL mapConcurrently fetch urls where fetch url = do response &lt;- httpBS (fromString url) return $ getResponseBody response超时处理#import Control.Concurrent.Async import Control.Concurrent (threadDelay) withTimeout :: Int -&gt; IO a -&gt; IO (Maybe a) withTimeout micros action = do result &lt;- race (threadDelay micros &gt;&gt; return Nothing) (fmap Just action) case result of Left _ -&gt; return Nothing Right x -&gt; return x main :: IO () main = do result &lt;- withTimeout 500000 $ do threadDelay 1000000 -- 这会超时 return &#34;Success&#34; case result of Just x -&gt; putStrLn x Nothing -&gt; putStrLn &#34;Timeout!&#34;高级特性#异常处理#safeAsync :: IO a -&gt; IO (Either SomeException a) safeAsync action = do a &lt;- async action waitCatch a取消操作#cancelWith :: Async a -&gt; Async b -&gt; IO () -- 当第一个async完成或异常时，取消第二个链接异步任务#link :: Async a -&gt; Async b -&gt; IO () -- 链接两个异步任务，一个失败时另一个也被取消STM 集成#poll :: Async a -&gt; STM (Maybe (Either SomeException a)) -- 非阻塞检查异步任务状态最佳实践#1. 资源管理#总是使用 withAsync 而非 async &#43; cancel 来确保资源清理。
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/haskell/async/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="Haskell Async 库详解#概述#Async 是 Haskell 中用于并发编程的核心库，提供了类型安全的异步操作管理，允许开发者以声明式风格编写并发代码。
+核心概念#Async 类型#data Async a = Async { asyncThreadId :: ThreadId, -- 其他内部字段 }表示一个正在进行的异步计算，最终会产生一个 a 类型的值。
+主要功能#启动异步任务#-- 基本异步操作 async :: IO a -&gt; IO (Async a) -- 带资源管理的异步 withAsync :: IO a -&gt; (Async a -&gt; IO b) -&gt; IO b -- 在特定CPU核心上运行 asyncOn :: Int -&gt; IO a -&gt; IO (Async a)等待结果#-- 阻塞等待结果 wait :: Async a -&gt; IO a -- 等待并捕获异常 waitCatch :: Async a -&gt; IO (Either SomeException a) -- 等待任意一个完成 waitAny :: [Async a] -&gt; IO (Async a, [Async a]) -- 等待全部完成 waitBoth :: Async a -&gt; Async b -&gt; IO (a, b)组合操作#-- 竞争：返回先完成的结果 race :: IO a -&gt; IO b -&gt; IO (Either a b) -- 并发执行两个操作 concurrently :: IO a -&gt; IO b -&gt; IO (a, b) -- 并发执行多个相同操作 replicateConcurrently :: Int -&gt; IO a -&gt; IO [a]遍历并发#-- 并发遍历列表 mapConcurrently :: Traversable t =&gt; (a -&gt; IO b) -&gt; t a -&gt; IO (t b) -- 并发循环 forConcurrently :: Traversable t =&gt; t a -&gt; (a -&gt; IO b) -&gt; IO (t b) -- 限制并发数 mapConcurrentlyN :: Int -&gt; (a -&gt; IO b) -&gt; [a] -&gt; IO [b]实用示例#基本使用#import Control.Concurrent.Async import Control.Concurrent (threadDelay) main :: IO () main = do -- 启动两个异步任务 a1 &lt;- async $ do threadDelay 1000000 return &#34;Task 1 done&#34; a2 &lt;- async $ do threadDelay 2000000 return &#34;Task 2 done&#34; -- 等待两个任务完成 r1 &lt;- wait a1 r2 &lt;- wait a2 putStrLn $ r1 &#43;&#43; &#34;, &#34; &#43;&#43; r2withAsync 自动清理#main :: IO () main = do -- withAsync 确保资源被正确释放 withAsync (longRunningTask &#34;Task1&#34;) $ \a1 -&gt; withAsync (longRunningTask &#34;Task2&#34;) $ \a2 -&gt; do r1 &lt;- wait a1 r2 &lt;- wait a2 print (r1, r2) where longRunningTask name = do threadDelay 500000 return name并发 Web 请求#import Control.Concurrent.Async import Network.HTTP.Simple import qualified Data.ByteString.Char8 as B fetchUrls :: [String] -&gt; IO [B.ByteString] fetchUrls urls = do -- 并发获取多个URL mapConcurrently fetch urls where fetch url = do response &lt;- httpBS (fromString url) return $ getResponseBody response超时处理#import Control.Concurrent.Async import Control.Concurrent (threadDelay) withTimeout :: Int -&gt; IO a -&gt; IO (Maybe a) withTimeout micros action = do result &lt;- race (threadDelay micros &gt;&gt; return Nothing) (fmap Just action) case result of Left _ -&gt; return Nothing Right x -&gt; return x main :: IO () main = do result &lt;- withTimeout 500000 $ do threadDelay 1000000 -- 这会超时 return &#34;Success&#34; case result of Just x -&gt; putStrLn x Nothing -&gt; putStrLn &#34;Timeout!&#34;高级特性#异常处理#safeAsync :: IO a -&gt; IO (Either SomeException a) safeAsync action = do a &lt;- async action waitCatch a取消操作#cancelWith :: Async a -&gt; Async b -&gt; IO () -- 当第一个async完成或异常时，取消第二个链接异步任务#link :: Async a -&gt; Async b -&gt; IO () -- 链接两个异步任务，一个失败时另一个也被取消STM 集成#poll :: Async a -&gt; STM (Maybe (Either SomeException a)) -- 非阻塞检查异步任务状态最佳实践#1. 资源管理#总是使用 withAsync 而非 async &#43; cancel 来确保资源清理。">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="Haskell Async 库详解#概述#Async 是 Haskell 中用于并发编程的核心库，提供了类型安全的异步操作管理，允许开发者以声明式风格编写并发代码。
+核心概念#Async 类型#data Async a = Async { asyncThreadId :: ThreadId, -- 其他内部字段 }表示一个正在进行的异步计算，最终会产生一个 a 类型的值。
+主要功能#启动异步任务#-- 基本异步操作 async :: IO a -&gt; IO (Async a) -- 带资源管理的异步 withAsync :: IO a -&gt; (Async a -&gt; IO b) -&gt; IO b -- 在特定CPU核心上运行 asyncOn :: Int -&gt; IO a -&gt; IO (Async a)等待结果#-- 阻塞等待结果 wait :: Async a -&gt; IO a -- 等待并捕获异常 waitCatch :: Async a -&gt; IO (Either SomeException a) -- 等待任意一个完成 waitAny :: [Async a] -&gt; IO (Async a, [Async a]) -- 等待全部完成 waitBoth :: Async a -&gt; Async b -&gt; IO (a, b)组合操作#-- 竞争：返回先完成的结果 race :: IO a -&gt; IO b -&gt; IO (Either a b) -- 并发执行两个操作 concurrently :: IO a -&gt; IO b -&gt; IO (a, b) -- 并发执行多个相同操作 replicateConcurrently :: Int -&gt; IO a -&gt; IO [a]遍历并发#-- 并发遍历列表 mapConcurrently :: Traversable t =&gt; (a -&gt; IO b) -&gt; t a -&gt; IO (t b) -- 并发循环 forConcurrently :: Traversable t =&gt; t a -&gt; (a -&gt; IO b) -&gt; IO (t b) -- 限制并发数 mapConcurrentlyN :: Int -&gt; (a -&gt; IO b) -&gt; [a] -&gt; IO [b]实用示例#基本使用#import Control.Concurrent.Async import Control.Concurrent (threadDelay) main :: IO () main = do -- 启动两个异步任务 a1 &lt;- async $ do threadDelay 1000000 return &#34;Task 1 done&#34; a2 &lt;- async $ do threadDelay 2000000 return &#34;Task 2 done&#34; -- 等待两个任务完成 r1 &lt;- wait a1 r2 &lt;- wait a2 putStrLn $ r1 &#43;&#43; &#34;, &#34; &#43;&#43; r2withAsync 自动清理#main :: IO () main = do -- withAsync 确保资源被正确释放 withAsync (longRunningTask &#34;Task1&#34;) $ \a1 -&gt; withAsync (longRunningTask &#34;Task2&#34;) $ \a2 -&gt; do r1 &lt;- wait a1 r2 &lt;- wait a2 print (r1, r2) where longRunningTask name = do threadDelay 500000 return name并发 Web 请求#import Control.Concurrent.Async import Network.HTTP.Simple import qualified Data.ByteString.Char8 as B fetchUrls :: [String] -&gt; IO [B.ByteString] fetchUrls urls = do -- 并发获取多个URL mapConcurrently fetch urls where fetch url = do response &lt;- httpBS (fromString url) return $ getResponseBody response超时处理#import Control.Concurrent.Async import Control.Concurrent (threadDelay) withTimeout :: Int -&gt; IO a -&gt; IO (Maybe a) withTimeout micros action = do result &lt;- race (threadDelay micros &gt;&gt; return Nothing) (fmap Just action) case result of Left _ -&gt; return Nothing Right x -&gt; return x main :: IO () main = do result &lt;- withTimeout 500000 $ do threadDelay 1000000 -- 这会超时 return &#34;Success&#34; case result of Just x -&gt; putStrLn x Nothing -&gt; putStrLn &#34;Timeout!&#34;高级特性#异常处理#safeAsync :: IO a -&gt; IO (Either SomeException a) safeAsync action = do a &lt;- async action waitCatch a取消操作#cancelWith :: Async a -&gt; Async b -&gt; IO () -- 当第一个async完成或异常时，取消第二个链接异步任务#link :: Async a -&gt; Async b -&gt; IO () -- 链接两个异步任务，一个失败时另一个也被取消STM 集成#poll :: Async a -&gt; STM (Maybe (Either SomeException a)) -- 非阻塞检查异步任务状态最佳实践#1. 资源管理#总是使用 withAsync 而非 async &#43; cancel 来确保资源清理。">
+  <meta itemprop="wordCount" content="632">
+
+<title>Async | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/haskell/async/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.c579ba65cf87c4a3e2d13fd4f4c772e36aead5cca5259be360e83293e7879b5c.js" integrity="sha256-xXm6Zc&#43;HxKPi0T/U9Mdy42rq1cylJZvjYOgyk&#43;eHm1w=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="">
+      Rust Algorithm</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="">
+      Rust Iterator Adapters</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/" class="">
+      内部可变性</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/" class="">
+      Haskell</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/async/" class="active">
+      Async</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/medical_imaging/" class="">
+      Medical Imaging</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Async</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#核心概念">核心概念</a>
+      <ul>
+        <li><a href="#async-类型">Async 类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#主要功能">主要功能</a>
+      <ul>
+        <li><a href="#启动异步任务">启动异步任务</a></li>
+        <li><a href="#等待结果">等待结果</a></li>
+        <li><a href="#组合操作">组合操作</a></li>
+        <li><a href="#遍历并发">遍历并发</a></li>
+      </ul>
+    </li>
+    <li><a href="#实用示例">实用示例</a>
+      <ul>
+        <li><a href="#基本使用">基本使用</a></li>
+        <li><a href="#withasync-自动清理">withAsync 自动清理</a></li>
+        <li><a href="#并发-web-请求">并发 Web 请求</a></li>
+        <li><a href="#超时处理">超时处理</a></li>
+      </ul>
+    </li>
+    <li><a href="#高级特性">高级特性</a>
+      <ul>
+        <li><a href="#异常处理">异常处理</a></li>
+        <li><a href="#取消操作">取消操作</a></li>
+        <li><a href="#链接异步任务">链接异步任务</a></li>
+        <li><a href="#stm-集成">STM 集成</a></li>
+      </ul>
+    </li>
+    <li><a href="#最佳实践">最佳实践</a>
+      <ul>
+        <li><a href="#1-资源管理">1. 资源管理</a></li>
+        <li><a href="#2-限制并发数">2. 限制并发数</a></li>
+        <li><a href="#3-错误处理策略">3. 错误处理策略</a></li>
+        <li><a href="#4-性能监控">4. 性能监控</a></li>
+      </ul>
+    </li>
+    <li><a href="#常见模式">常见模式</a>
+      <ul>
+        <li><a href="#扇出扇入模式">扇出/扇入模式</a></li>
+        <li><a href="#管道并行">管道并行</a></li>
+      </ul>
+    </li>
+    <li><a href="#注意事项">注意事项</a></li>
+    <li><a href="#相关扩展库">相关扩展库</a></li>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#性能特点">性能特点</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="haskell-async-库详解">Haskell Async 库详解<a class="anchor" href="#haskell-async-%e5%ba%93%e8%af%a6%e8%a7%a3">#</a></h1>
+<h2 id="概述">概述<a class="anchor" href="#%e6%a6%82%e8%bf%b0">#</a></h2>
+<p>Async 是 Haskell 中用于并发编程的核心库，提供了类型安全的异步操作管理，允许开发者以声明式风格编写并发代码。</p>
+<h2 id="核心概念">核心概念<a class="anchor" href="#%e6%a0%b8%e5%bf%83%e6%a6%82%e5%bf%b5">#</a></h2>
+<h3 id="async-类型">Async 类型<a class="anchor" href="#async-%e7%b1%bb%e5%9e%8b">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#66d9ef">data</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">=</span> <span style="color:#66d9ef">Async</span> { 
+</span></span><span style="display:flex;"><span>    asyncThreadId <span style="color:#f92672">::</span> <span style="color:#66d9ef">ThreadId</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 其他内部字段</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><p>表示一个正在进行的异步计算，最终会产生一个 <code>a</code> 类型的值。</p>
+<h2 id="主要功能">主要功能<a class="anchor" href="#%e4%b8%bb%e8%a6%81%e5%8a%9f%e8%83%bd">#</a></h2>
+<h3 id="启动异步任务">启动异步任务<a class="anchor" href="#%e5%90%af%e5%8a%a8%e5%bc%82%e6%ad%a5%e4%bb%bb%e5%8a%a1">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#75715e">-- 基本异步操作</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">async</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Async</span> a)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 带资源管理的异步</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">withAsync</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> (<span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 在特定CPU核心上运行</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">asyncOn</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Int</span> <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Async</span> a)</span></span></code></pre></div><h3 id="等待结果">等待结果<a class="anchor" href="#%e7%ad%89%e5%be%85%e7%bb%93%e6%9e%9c">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#75715e">-- 阻塞等待结果</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">wait</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 等待并捕获异常</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">waitCatch</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Either</span> <span style="color:#66d9ef">SomeException</span> a)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 等待任意一个完成</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">waitAny</span> <span style="color:#f92672">::</span> [<span style="color:#66d9ef">Async</span> a] <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Async</span> a, [<span style="color:#66d9ef">Async</span> a])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 等待全部完成</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">waitBoth</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">Async</span> b <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (a, b)</span></span></code></pre></div><h3 id="组合操作">组合操作<a class="anchor" href="#%e7%bb%84%e5%90%88%e6%93%8d%e4%bd%9c">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#75715e">-- 竞争：返回先完成的结果</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">race</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Either</span> a b)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 并发执行两个操作</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">concurrently</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (a, b)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 并发执行多个相同操作</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">replicateConcurrently</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Int</span> <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> [a]</span></span></code></pre></div><h3 id="遍历并发">遍历并发<a class="anchor" href="#%e9%81%8d%e5%8e%86%e5%b9%b6%e5%8f%91">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#75715e">-- 并发遍历列表</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">mapConcurrently</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Traversable</span> t <span style="color:#f92672">=&gt;</span> (a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b) <span style="color:#f92672">-&gt;</span> t a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (t b)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 并发循环</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">forConcurrently</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Traversable</span> t <span style="color:#f92672">=&gt;</span> t a <span style="color:#f92672">-&gt;</span> (a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (t b)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 限制并发数</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">mapConcurrentlyN</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Int</span> <span style="color:#f92672">-&gt;</span> (a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b) <span style="color:#f92672">-&gt;</span> [a] <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> [b]</span></span></code></pre></div><h2 id="实用示例">实用示例<a class="anchor" href="#%e5%ae%9e%e7%94%a8%e7%a4%ba%e4%be%8b">#</a></h2>
+<h3 id="基本使用">基本使用<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e4%bd%bf%e7%94%a8">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Control.Concurrent.Async
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Control.Concurrent (<span style="color:#a6e22e">threadDelay</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">main</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> ()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 启动两个异步任务</span>
+</span></span><span style="display:flex;"><span>    a1 <span style="color:#f92672">&lt;-</span> async <span style="color:#f92672">$</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        threadDelay <span style="color:#ae81ff">1000000</span>
+</span></span><span style="display:flex;"><span>        return <span style="color:#e6db74">&#34;Task 1 done&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    a2 <span style="color:#f92672">&lt;-</span> async <span style="color:#f92672">$</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        threadDelay <span style="color:#ae81ff">2000000</span>
+</span></span><span style="display:flex;"><span>        return <span style="color:#e6db74">&#34;Task 2 done&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 等待两个任务完成</span>
+</span></span><span style="display:flex;"><span>    r1 <span style="color:#f92672">&lt;-</span> wait a1
+</span></span><span style="display:flex;"><span>    r2 <span style="color:#f92672">&lt;-</span> wait a2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    putStrLn <span style="color:#f92672">$</span> r1 <span style="color:#f92672">++</span> <span style="color:#e6db74">&#34;, &#34;</span> <span style="color:#f92672">++</span> r2</span></span></code></pre></div><h3 id="withasync-自动清理">withAsync 自动清理<a class="anchor" href="#withasync-%e8%87%aa%e5%8a%a8%e6%b8%85%e7%90%86">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">main</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> ()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- withAsync 确保资源被正确释放</span>
+</span></span><span style="display:flex;"><span>    withAsync (longRunningTask <span style="color:#e6db74">&#34;Task1&#34;</span>) <span style="color:#f92672">$</span> <span style="color:#a6e22e">\</span>a1 <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>        withAsync (longRunningTask <span style="color:#e6db74">&#34;Task2&#34;</span>) <span style="color:#f92672">$</span> <span style="color:#a6e22e">\</span>a2 <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>            r1 <span style="color:#f92672">&lt;-</span> wait a1
+</span></span><span style="display:flex;"><span>            r2 <span style="color:#f92672">&lt;-</span> wait a2
+</span></span><span style="display:flex;"><span>            print (r1, r2)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">where</span>
+</span></span><span style="display:flex;"><span>    longRunningTask name <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        threadDelay <span style="color:#ae81ff">500000</span>
+</span></span><span style="display:flex;"><span>        return name</span></span></code></pre></div><h3 id="并发-web-请求">并发 Web 请求<a class="anchor" href="#%e5%b9%b6%e5%8f%91-web-%e8%af%b7%e6%b1%82">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Control.Concurrent.Async
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Network.HTTP.Simple
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#66d9ef">qualified</span> Data.ByteString.Char8 <span style="color:#66d9ef">as</span> B
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fetchUrls</span> <span style="color:#f92672">::</span> [<span style="color:#66d9ef">String</span>] <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> [<span style="color:#66d9ef">B</span><span style="color:#f92672">.</span><span style="color:#66d9ef">ByteString</span>]
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fetchUrls</span> urls <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 并发获取多个URL</span>
+</span></span><span style="display:flex;"><span>    mapConcurrently fetch urls
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">where</span>
+</span></span><span style="display:flex;"><span>    fetch url <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">&lt;-</span> httpBS (fromString url)
+</span></span><span style="display:flex;"><span>        return <span style="color:#f92672">$</span> getResponseBody response</span></span></code></pre></div><h3 id="超时处理">超时处理<a class="anchor" href="#%e8%b6%85%e6%97%b6%e5%a4%84%e7%90%86">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Control.Concurrent.Async
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Control.Concurrent (<span style="color:#a6e22e">threadDelay</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">withTimeout</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Int</span> <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Maybe</span> a)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">withTimeout</span> micros action <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">&lt;-</span> race (threadDelay micros <span style="color:#f92672">&gt;&gt;</span> return <span style="color:#66d9ef">Nothing</span>)
+</span></span><span style="display:flex;"><span>                   (fmap <span style="color:#66d9ef">Just</span> action)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> result <span style="color:#66d9ef">of</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">Left</span> <span style="color:#66d9ef">_</span> <span style="color:#f92672">-&gt;</span> return <span style="color:#66d9ef">Nothing</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">Right</span> x <span style="color:#f92672">-&gt;</span> return x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">main</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> ()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">&lt;-</span> withTimeout <span style="color:#ae81ff">500000</span> <span style="color:#f92672">$</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        threadDelay <span style="color:#ae81ff">1000000</span>  <span style="color:#75715e">-- 这会超时</span>
+</span></span><span style="display:flex;"><span>        return <span style="color:#e6db74">&#34;Success&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> result <span style="color:#66d9ef">of</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">Just</span> x <span style="color:#f92672">-&gt;</span> putStrLn x
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">Nothing</span> <span style="color:#f92672">-&gt;</span> putStrLn <span style="color:#e6db74">&#34;Timeout!&#34;</span></span></span></code></pre></div><h2 id="高级特性">高级特性<a class="anchor" href="#%e9%ab%98%e7%ba%a7%e7%89%b9%e6%80%a7">#</a></h2>
+<h3 id="异常处理">异常处理<a class="anchor" href="#%e5%bc%82%e5%b8%b8%e5%a4%84%e7%90%86">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">safeAsync</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Either</span> <span style="color:#66d9ef">SomeException</span> a)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">safeAsync</span> action <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    a <span style="color:#f92672">&lt;-</span> async action
+</span></span><span style="display:flex;"><span>    waitCatch a</span></span></code></pre></div><h3 id="取消操作">取消操作<a class="anchor" href="#%e5%8f%96%e6%b6%88%e6%93%8d%e4%bd%9c">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">cancelWith</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">Async</span> b <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> ()
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 当第一个async完成或异常时，取消第二个</span></span></span></code></pre></div><h3 id="链接异步任务">链接异步任务<a class="anchor" href="#%e9%93%be%e6%8e%a5%e5%bc%82%e6%ad%a5%e4%bb%bb%e5%8a%a1">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">link</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">Async</span> b <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> ()
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 链接两个异步任务，一个失败时另一个也被取消</span></span></span></code></pre></div><h3 id="stm-集成">STM 集成<a class="anchor" href="#stm-%e9%9b%86%e6%88%90">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">poll</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">Async</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">STM</span> (<span style="color:#66d9ef">Maybe</span> (<span style="color:#66d9ef">Either</span> <span style="color:#66d9ef">SomeException</span> a))
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 非阻塞检查异步任务状态</span></span></span></code></pre></div><h2 id="最佳实践">最佳实践<a class="anchor" href="#%e6%9c%80%e4%bd%b3%e5%ae%9e%e8%b7%b5">#</a></h2>
+<h3 id="1-资源管理">1. 资源管理<a class="anchor" href="#1-%e8%b5%84%e6%ba%90%e7%ae%a1%e7%90%86">#</a></h3>
+<p>总是使用 <code>withAsync</code> 而非 <code>async</code> + <code>cancel</code> 来确保资源清理。</p>
+<h3 id="2-限制并发数">2. 限制并发数<a class="anchor" href="#2-%e9%99%90%e5%88%b6%e5%b9%b6%e5%8f%91%e6%95%b0">#</a></h3>
+<p>避免创建过多线程，使用 <code>mapConcurrentlyN</code> 或连接池。</p>
+<h3 id="3-错误处理策略">3. 错误处理策略<a class="anchor" href="#3-%e9%94%99%e8%af%af%e5%a4%84%e7%90%86%e7%ad%96%e7%95%a5">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#75715e">-- 收集所有结果，包括失败的</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">allResults</span> <span style="color:#f92672">&lt;-</span> mapConcurrently (try <span style="color:#f92672">@</span><span style="color:#66d9ef">SomeException</span>) actions</span></span></code></pre></div><h3 id="4-性能监控">4. 性能监控<a class="anchor" href="#4-%e6%80%a7%e8%83%bd%e7%9b%91%e6%8e%a7">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> Control.Concurrent.Async.Timer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">timedAsync</span> <span style="color:#f92672">::</span> <span style="color:#66d9ef">IO</span> a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> (<span style="color:#66d9ef">Async</span> a, <span style="color:#66d9ef">Async</span> ())
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">timedAsync</span> action <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    (a, timer) <span style="color:#f92672">&lt;-</span> asyncTimed action
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">_</span> <span style="color:#f92672">&lt;-</span> async <span style="color:#f92672">$</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        elapsed <span style="color:#f92672">&lt;-</span> wait timer
+</span></span><span style="display:flex;"><span>        putStrLn <span style="color:#f92672">$</span> <span style="color:#e6db74">&#34;Task took: &#34;</span> <span style="color:#f92672">++</span> show elapsed
+</span></span><span style="display:flex;"><span>    return a</span></span></code></pre></div><h2 id="常见模式">常见模式<a class="anchor" href="#%e5%b8%b8%e8%a7%81%e6%a8%a1%e5%bc%8f">#</a></h2>
+<h3 id="扇出扇入模式">扇出/扇入模式<a class="anchor" href="#%e6%89%87%e5%87%ba%e6%89%87%e5%85%a5%e6%a8%a1%e5%bc%8f">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">fanOutFanIn</span> <span style="color:#f92672">::</span> [<span style="color:#66d9ef">IO</span> a] <span style="color:#f92672">-&gt;</span> (a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> [b]
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fanOutFanIn</span> producers consumer <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 扇出：并发执行生产者</span>
+</span></span><span style="display:flex;"><span>    inputs <span style="color:#f92672">&lt;-</span> mapConcurrently id producers
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 扇入：并发处理结果</span>
+</span></span><span style="display:flex;"><span>    mapConcurrently consumer inputs</span></span></code></pre></div><h3 id="管道并行">管道并行<a class="anchor" href="#%e7%ae%a1%e9%81%93%e5%b9%b6%e8%a1%8c">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-haskell" data-lang="haskell"><span style="display:flex;"><span><span style="color:#a6e22e">pipeline</span> <span style="color:#f92672">::</span> [a] <span style="color:#f92672">-&gt;</span> (a <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> b) <span style="color:#f92672">-&gt;</span> (b <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> c) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">IO</span> [c]
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">pipeline</span> inputs stage1 stage2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 第一阶段并发</span>
+</span></span><span style="display:flex;"><span>    intermediate <span style="color:#f92672">&lt;-</span> mapConcurrently stage1 inputs
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- 第二阶段并发</span>
+</span></span><span style="display:flex;"><span>    mapConcurrently stage2 intermediate</span></span></code></pre></div><h2 id="注意事项">注意事项<a class="anchor" href="#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9">#</a></h2>
+<ol>
+<li><strong>内存使用</strong>：大量并发任务可能消耗大量内存</li>
+<li><strong>异常传播</strong>：未捕获的异常会终止整个程序</li>
+<li><strong>线程安全</strong>：确保共享数据的同步访问</li>
+<li><strong>死锁避免</strong>：注意异步任务间的依赖关系</li>
+</ol>
+<h2 id="相关扩展库">相关扩展库<a class="anchor" href="#%e7%9b%b8%e5%85%b3%e6%89%a9%e5%b1%95%e5%ba%93">#</a></h2>
+<ul>
+<li><strong>async-pool</strong>：连接池管理</li>
+<li><strong>async-timer</strong>：带计时的异步操作</li>
+<li><strong>stm-conduit</strong>：与conduit集成</li>
+<li><strong>thread-local-storage</strong>：线程局部变量管理</li>
+</ul>
+<h2 id="安装">安装<a class="anchor" href="#%e5%ae%89%e8%a3%85">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 使用 cabal</span>
+</span></span><span style="display:flex;"><span>cabal install async
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 使用 stack</span>
+</span></span><span style="display:flex;"><span>stack install async</span></span></code></pre></div><h2 id="性能特点">性能特点<a class="anchor" href="#%e6%80%a7%e8%83%bd%e7%89%b9%e7%82%b9">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>轻量级线程</strong></td>
+          <td>Haskell 的轻量级线程支持数千个并发任务</td>
+      </tr>
+      <tr>
+          <td><strong>真正的并行</strong></td>
+          <td>在多核CPU上可以真正并行执行</td>
+      </tr>
+      <tr>
+          <td><strong>非阻塞I/O</strong></td>
+          <td>自动利用系统的非阻塞I/O机制</td>
+      </tr>
+      <tr>
+          <td><strong>低开销</strong></td>
+          <td>上下文切换开销极小</td>
+      </tr>
+  </tbody>
+</table>
+<p>这个库通过提供高级抽象，使得Haskell中的并发编程变得更加直观和安全，是构建高性能并发应用的强大工具。</p>
+<pre tabindex="0"><code></code></pre></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/haskell/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Haskell</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/medical_imaging/" class="flex align-center">
+        <span>Medical Imaging</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#核心概念">核心概念</a>
+      <ul>
+        <li><a href="#async-类型">Async 类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#主要功能">主要功能</a>
+      <ul>
+        <li><a href="#启动异步任务">启动异步任务</a></li>
+        <li><a href="#等待结果">等待结果</a></li>
+        <li><a href="#组合操作">组合操作</a></li>
+        <li><a href="#遍历并发">遍历并发</a></li>
+      </ul>
+    </li>
+    <li><a href="#实用示例">实用示例</a>
+      <ul>
+        <li><a href="#基本使用">基本使用</a></li>
+        <li><a href="#withasync-自动清理">withAsync 自动清理</a></li>
+        <li><a href="#并发-web-请求">并发 Web 请求</a></li>
+        <li><a href="#超时处理">超时处理</a></li>
+      </ul>
+    </li>
+    <li><a href="#高级特性">高级特性</a>
+      <ul>
+        <li><a href="#异常处理">异常处理</a></li>
+        <li><a href="#取消操作">取消操作</a></li>
+        <li><a href="#链接异步任务">链接异步任务</a></li>
+        <li><a href="#stm-集成">STM 集成</a></li>
+      </ul>
+    </li>
+    <li><a href="#最佳实践">最佳实践</a>
+      <ul>
+        <li><a href="#1-资源管理">1. 资源管理</a></li>
+        <li><a href="#2-限制并发数">2. 限制并发数</a></li>
+        <li><a href="#3-错误处理策略">3. 错误处理策略</a></li>
+        <li><a href="#4-性能监控">4. 性能监控</a></li>
+      </ul>
+    </li>
+    <li><a href="#常见模式">常见模式</a>
+      <ul>
+        <li><a href="#扇出扇入模式">扇出/扇入模式</a></li>
+        <li><a href="#管道并行">管道并行</a></li>
+      </ul>
+    </li>
+    <li><a href="#注意事项">注意事项</a></li>
+    <li><a href="#相关扩展库">相关扩展库</a></li>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#性能特点">性能特点</a></li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
