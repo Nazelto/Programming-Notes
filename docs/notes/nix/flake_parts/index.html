@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="flake-parts#flake-parts模块化#{ inputs.flake-parts.url = &#34;github:hercules-ci/flake-parts&#34;; outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { # 每个配置块都是独立的模块 systems = [ &#34;x86_64-linux&#34; &#34;aarch64-darwin&#34; ]; perSystem = { config, pkgs, ... }: { packages.default = pkgs.hello; devShells.default = pkgs.mkShell { }; }; }; }# flake.nix { outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { imports = [ ./packages.nix # 包定义模块 ./devshells.nix # 开发环境模块 ./nixos.nix # NixOS 配置模块 ./checks.nix # 测试检查模块 ]; }; } # packages.nix { ... }: { perSystem = { pkgs, ... }: { packages = { app1 = pkgs.callPackage ./app1 { }; app2 = pkgs.callPackage ./app2 { }; }; }; } # devshells.nix { ... }: { perSystem = { pkgs, ... }: { devShells.default = pkgs.mkShell { packages = [ pkgs.git pkgs.nodejs ]; }; }; }flake创建包#{ description = &#34;Functional Template Library for C&#43;&#43;&#34;; inputs = { nixpkgs.url = &#34;github:nixos/nixpkgs/nixos-25.11&#34;; flake-parts.url = &#34;github:hercules-ci/flake-parts&#34;; }; outputs = inputs@{ self, nixpkgs, flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { systems = [ &#34;x86_64-linux&#34; &#34;aarch64-linux&#34; &#34;x86_64-darwin&#34; &#34;aarch64-darwin&#34; ]; perSystem = { config, self&#39;, inputs&#39;, pkgs, system, ... }: { packages = { default = pkgs.callPackage ./ftl.nix { }; }; }; flake = { overlays.default = final: prev: { ftl = final.callPackage ./ftl.nix { }; }; }; }; }使用flake-parts打包c&#43;&#43; ftl库
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/nix/flake_parts/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="flake-parts#flake-parts模块化#{ inputs.flake-parts.url = &#34;github:hercules-ci/flake-parts&#34;; outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { # 每个配置块都是独立的模块 systems = [ &#34;x86_64-linux&#34; &#34;aarch64-darwin&#34; ]; perSystem = { config, pkgs, ... }: { packages.default = pkgs.hello; devShells.default = pkgs.mkShell { }; }; }; }# flake.nix { outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { imports = [ ./packages.nix # 包定义模块 ./devshells.nix # 开发环境模块 ./nixos.nix # NixOS 配置模块 ./checks.nix # 测试检查模块 ]; }; } # packages.nix { ... }: { perSystem = { pkgs, ... }: { packages = { app1 = pkgs.callPackage ./app1 { }; app2 = pkgs.callPackage ./app2 { }; }; }; } # devshells.nix { ... }: { perSystem = { pkgs, ... }: { devShells.default = pkgs.mkShell { packages = [ pkgs.git pkgs.nodejs ]; }; }; }flake创建包#{ description = &#34;Functional Template Library for C&#43;&#43;&#34;; inputs = { nixpkgs.url = &#34;github:nixos/nixpkgs/nixos-25.11&#34;; flake-parts.url = &#34;github:hercules-ci/flake-parts&#34;; }; outputs = inputs@{ self, nixpkgs, flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { systems = [ &#34;x86_64-linux&#34; &#34;aarch64-linux&#34; &#34;x86_64-darwin&#34; &#34;aarch64-darwin&#34; ]; perSystem = { config, self&#39;, inputs&#39;, pkgs, system, ... }: { packages = { default = pkgs.callPackage ./ftl.nix { }; }; }; flake = { overlays.default = final: prev: { ftl = final.callPackage ./ftl.nix { }; }; }; }; }使用flake-parts打包c&#43;&#43; ftl库">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="flake-parts#flake-parts模块化#{ inputs.flake-parts.url = &#34;github:hercules-ci/flake-parts&#34;; outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { # 每个配置块都是独立的模块 systems = [ &#34;x86_64-linux&#34; &#34;aarch64-darwin&#34; ]; perSystem = { config, pkgs, ... }: { packages.default = pkgs.hello; devShells.default = pkgs.mkShell { }; }; }; }# flake.nix { outputs = inputs@{ flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { imports = [ ./packages.nix # 包定义模块 ./devshells.nix # 开发环境模块 ./nixos.nix # NixOS 配置模块 ./checks.nix # 测试检查模块 ]; }; } # packages.nix { ... }: { perSystem = { pkgs, ... }: { packages = { app1 = pkgs.callPackage ./app1 { }; app2 = pkgs.callPackage ./app2 { }; }; }; } # devshells.nix { ... }: { perSystem = { pkgs, ... }: { devShells.default = pkgs.mkShell { packages = [ pkgs.git pkgs.nodejs ]; }; }; }flake创建包#{ description = &#34;Functional Template Library for C&#43;&#43;&#34;; inputs = { nixpkgs.url = &#34;github:nixos/nixpkgs/nixos-25.11&#34;; flake-parts.url = &#34;github:hercules-ci/flake-parts&#34;; }; outputs = inputs@{ self, nixpkgs, flake-parts, ... }: flake-parts.lib.mkFlake { inherit inputs; } { systems = [ &#34;x86_64-linux&#34; &#34;aarch64-linux&#34; &#34;x86_64-darwin&#34; &#34;aarch64-darwin&#34; ]; perSystem = { config, self&#39;, inputs&#39;, pkgs, system, ... }: { packages = { default = pkgs.callPackage ./ftl.nix { }; }; }; flake = { overlays.default = final: prev: { ftl = final.callPackage ./ftl.nix { }; }; }; }; }使用flake-parts打包c&#43;&#43; ftl库">
+  <meta itemprop="wordCount" content="254">
+
+<title>Flake Parts | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/nix/flake_parts/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.60ad33855082913ef36d1d886d055c45b19fb10d206f14c324679ff0aa5858e4.js" integrity="sha256-YK0zhVCCkT7zbR2IbQVcRbGfsQ0gbxTDJGef8KpYWOQ=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d87527d98c3e3fb63eee838a8bbea11" class="toggle"  />
+    <label for="section-6d87527d98c3e3fb63eee838a8bbea11" class="flex">
+      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/" class="">
+        C&#43;&#43;</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/" class="">
+      Coroutine</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="">
+      Crtp</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/ftl/" class="">
+      Ftl</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dc456b687142a9e10cb3f8aed083df22" class="toggle" checked />
+    <label for="section-dc456b687142a9e10cb3f8aed083df22" class="flex">
+      <a href="/Programming-Notes/docs/notes/nix/" class="">
+        Nix</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/nix/flake_parts/" class="active">
+      Flake Parts</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="">
+      Rust Algorithm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/dp/" class="">
+      Dp</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="">
+      Rust Iterator Adapters</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/" class="">
+      内部可变性</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/" class="">
+      Haskell</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/async/" class="">
+      Async</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/medical_imaging/" class="">
+      Medical Imaging</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Flake Parts</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#flake-parts模块化">flake-parts模块化</a></li>
+    <li><a href="#flake创建包">flake创建包</a></li>
+    <li><a href="#导出flake函数">导出flake函数</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="flake-parts">flake-parts<a class="anchor" href="#flake-parts">#</a></h1>
+<h2 id="flake-parts模块化">flake-parts模块化<a class="anchor" href="#flake-parts%e6%a8%a1%e5%9d%97%e5%8c%96">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  inputs<span style="color:#f92672">.</span>flake-parts<span style="color:#f92672">.</span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;github:hercules-ci/flake-parts&#34;</span>;
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#f92672">=</span> inputs<span style="color:#f92672">@</span>{ flake-parts<span style="color:#f92672">,</span> <span style="color:#f92672">...</span> }:
+</span></span><span style="display:flex;"><span>    flake-parts<span style="color:#f92672">.</span>lib<span style="color:#f92672">.</span>mkFlake { <span style="color:#66d9ef">inherit</span> inputs; } {
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># 每个配置块都是独立的模块</span>
+</span></span><span style="display:flex;"><span>      systems <span style="color:#f92672">=</span> [ <span style="color:#e6db74">&#34;x86_64-linux&#34;</span> <span style="color:#e6db74">&#34;aarch64-darwin&#34;</span> ];
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      perSystem <span style="color:#f92672">=</span> { config<span style="color:#f92672">,</span> pkgs<span style="color:#f92672">,</span> <span style="color:#f92672">...</span> }: {
+</span></span><span style="display:flex;"><span>        packages<span style="color:#f92672">.</span>default <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>hello;
+</span></span><span style="display:flex;"><span>        devShells<span style="color:#f92672">.</span>default <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>mkShell { };
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#75715e"># flake.nix</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#f92672">=</span> inputs<span style="color:#f92672">@</span>{ flake-parts<span style="color:#f92672">,</span> <span style="color:#f92672">...</span> }:
+</span></span><span style="display:flex;"><span>    flake-parts<span style="color:#f92672">.</span>lib<span style="color:#f92672">.</span>mkFlake { <span style="color:#66d9ef">inherit</span> inputs; } {
+</span></span><span style="display:flex;"><span>      imports <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">./packages.nix</span>      <span style="color:#75715e"># 包定义模块</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">./devshells.nix</span>     <span style="color:#75715e"># 开发环境模块</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">./nixos.nix</span>         <span style="color:#75715e"># NixOS 配置模块</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">./checks.nix</span>        <span style="color:#75715e"># 测试检查模块</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># packages.nix</span>
+</span></span><span style="display:flex;"><span>{ <span style="color:#f92672">...</span> }: {
+</span></span><span style="display:flex;"><span>  perSystem <span style="color:#f92672">=</span> { pkgs<span style="color:#f92672">,</span> <span style="color:#f92672">...</span> }: {
+</span></span><span style="display:flex;"><span>    packages <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      app1 <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>callPackage <span style="color:#e6db74">./app1</span> { };
+</span></span><span style="display:flex;"><span>      app2 <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>callPackage <span style="color:#e6db74">./app2</span> { };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># devshells.nix</span>
+</span></span><span style="display:flex;"><span>{ <span style="color:#f92672">...</span> }: {
+</span></span><span style="display:flex;"><span>  perSystem <span style="color:#f92672">=</span> { pkgs<span style="color:#f92672">,</span> <span style="color:#f92672">...</span> }: {
+</span></span><span style="display:flex;"><span>    devShells<span style="color:#f92672">.</span>default <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>mkShell {
+</span></span><span style="display:flex;"><span>      packages <span style="color:#f92672">=</span> [ pkgs<span style="color:#f92672">.</span>git pkgs<span style="color:#f92672">.</span>nodejs ];
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h2 id="flake创建包">flake创建包<a class="anchor" href="#flake%e5%88%9b%e5%bb%ba%e5%8c%85">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  description <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Functional Template Library for C++&#34;</span>;
+</span></span><span style="display:flex;"><span>  inputs <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    nixpkgs<span style="color:#f92672">.</span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;github:nixos/nixpkgs/nixos-25.11&#34;</span>;
+</span></span><span style="display:flex;"><span>    flake-parts<span style="color:#f92672">.</span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;github:hercules-ci/flake-parts&#34;</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  outputs <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>    inputs<span style="color:#f92672">@</span>{
+</span></span><span style="display:flex;"><span>      self<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>      nixpkgs<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>      flake-parts<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    }:
+</span></span><span style="display:flex;"><span>    flake-parts<span style="color:#f92672">.</span>lib<span style="color:#f92672">.</span>mkFlake { <span style="color:#66d9ef">inherit</span> inputs; } {
+</span></span><span style="display:flex;"><span>      systems <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;x86_64-linux&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;aarch64-linux&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;x86_64-darwin&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;aarch64-darwin&#34;</span>
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>      perSystem <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          config<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>          self&#39;<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>          inputs&#39;<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>          pkgs<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>          system<span style="color:#f92672">,</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>        }:
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          packages <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            default <span style="color:#f92672">=</span> pkgs<span style="color:#f92672">.</span>callPackage <span style="color:#e6db74">./ftl.nix</span> { };
+</span></span><span style="display:flex;"><span>          };
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>      flake <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        overlays<span style="color:#f92672">.</span>default <span style="color:#f92672">=</span> final: prev: {
+</span></span><span style="display:flex;"><span>          ftl <span style="color:#f92672">=</span> final<span style="color:#f92672">.</span>callPackage <span style="color:#e6db74">./ftl.nix</span> { };
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><p>使用flake-parts打包c++ ftl库</p>
+<blockquote class='book-hint tip'>
+<p>overlays 覆盖你的pkgs将你的ftl加入nixpkgs
+可以像下面一样使用</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#66d9ef">let</span>
+</span></span><span style="display:flex;"><span>    pkgs <span style="color:#f92672">=</span> <span style="color:#f92672">import</span> nixpkgs {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># overlays 这里必须是list 为了组合多了overlays</span>
+</span></span><span style="display:flex;"><span>        overlays <span style="color:#f92672">=</span> [ftl<span style="color:#f92672">.</span>overlays<span style="color:#f92672">.</span>default];
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">in</span>
+</span></span><span style="display:flex;"><span>buildInputs <span style="color:#f92672">=</span> <span style="color:#66d9ef">with</span> pkgs; [ftl];</span></span></code></pre></div><h2 id="导出flake函数">导出flake函数<a class="anchor" href="#%e5%af%bc%e5%87%baflake%e5%87%bd%e6%95%b0">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nix" data-lang="nix"><span style="display:flex;"><span><span style="color:#75715e"># 使用flake-parts在flake中导出自定义函数</span>
+</span></span><span style="display:flex;"><span>flake <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    lib <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">//</span><span style="color:#960050;background-color:#1e0010">普通函数</span>
+</span></span><span style="display:flex;"><span>        capitalize <span style="color:#f92672">=</span> str: <span style="color:#f92672">...</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>};</span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/nix/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Nix</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/rust/" class="flex align-center">
+        <span>Rust</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#flake-parts模块化">flake-parts模块化</a></li>
+    <li><a href="#flake创建包">flake创建包</a></li>
+    <li><a href="#导出flake函数">导出flake函数</a></li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -12,6 +12,8 @@
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/</loc>
   </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/nix/</loc>
+  </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_algorithm/</loc>
@@ -24,13 +26,19 @@
     <loc>https://nazelto.github.io/Programming-Notes/post/</loc>
     <lastmod>2025-11-19T11:11:43+08:00</lastmod>
   </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/</loc>
+  </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/crtp/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/ftl/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/haskell/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/haskell/async/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/medical_imaging/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/nix/flake_parts/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/python/functional_py/</loc>
   </url><url>
@@ -39,6 +47,8 @@
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/python/modern_python/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/lifetime/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_algorithm/dp/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_iterator_adapters/</loc>
   </url><url>

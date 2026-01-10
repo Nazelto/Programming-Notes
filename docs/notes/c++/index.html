@@ -34,7 +34,7 @@ class Point { int x,y,z; }; // 聚类语法中未初始化的值使用默认值 
 Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有权”概念的类型
 //基本类型可不使用移动构造 Point (Point &amp;&amp;Other) noexcept: x(Other.x),y(Other.y) {} 万能引用#万能引用识别条件
 必须是模板参数 T&amp;&amp; 必须有类型推导 template&lt;typename T&gt; void func(T&amp;&amp; param) { // param 可以绑定到任何东西 } Point p; const Point cp; func(p); // T = Point&amp;, param 类型是 Point&amp; func(cp); // T = const Point&amp;, param 类型是 const Point&amp; func(Point(1, 2)); // T = Point, param 类型是 Point&amp;&amp; func(std::move(p)); // T = Point, param 类型是 Point&amp;&amp; 引用折叠规则#T&amp; &amp; → T&amp; // 左值引用 &#43; 左值引用 = 左值引用 T&amp; &amp;&amp; → T&amp; // 左值引用 &#43; 右值引用 = 左值引用 T&amp;&amp; &amp; → T&amp; // 右值引用 &#43; 左值引用 = 左值引用 T&amp;&amp; &amp;&amp; → T&amp;&amp; // 右值引用 &#43; 右值引用 = 右值引用 完美转发#template&lt;typename T&gt; void wrapper(T&amp;&amp; param) { real_function(param); // ❌ 问题：param 总是左值！ } void real_function(Point&amp; p) { std::cout &lt;&lt; &#34;左值版本\n&#34;; } void real_function(Point&amp;&amp; p) { std::cout &lt;&lt; &#34;右值版本\n&#34;; } Point p; wrapper(p); // 调用左值版本 ✓ wrapper(Point(1, 2)); // 还是调用左值版本！✗ 核心问题：即使 param 绑定到右值，param 本身作为表达式是左值！">
-  <meta itemprop="wordCount" content="200">
+  <meta itemprop="wordCount" content="209">
 
 <title>C&#43;&#43; | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
@@ -44,7 +44,7 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
 
 
   <script defer src="/Programming-Notes/fuse.min.js"></script>
-  <script defer src="/Programming-Notes/en.search.min.4aea2df3de42d20a771a7e97dda929553dbabbfb76161e4ce80fa0e2909964cc.js" integrity="sha256-Suot895C0gp3Gn6X3akpVT26u/t2Fh5M6A&#43;g4pCZZMw=" crossorigin="anonymous"></script>
+  <script defer src="/Programming-Notes/en.search.min.60ad33855082913ef36d1d886d055c45b19fb10d206f14c324679ff0aa5858e4.js" integrity="sha256-YK0zhVCCkT7zbR2IbQVcRbGfsQ0gbxTDJGef8KpYWOQ=" crossorigin="anonymous"></script>
 
 
 <link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/docs/notes/c++/index.xml" title="Nazeltoの编程随记" />
@@ -232,8 +232,73 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
   
 
   
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/" class="">
+      Coroutine</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
     <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="">
       Crtp</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/ftl/" class="">
+      Ftl</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dc456b687142a9e10cb3f8aed083df22" class="toggle"  />
+    <label for="section-dc456b687142a9e10cb3f8aed083df22" class="flex">
+      <a href="/Programming-Notes/docs/notes/nix/" class="">
+        Nix</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/nix/flake_parts/" class="">
+      Flake Parts</a>
   
 
         </li>
@@ -275,6 +340,20 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
 
           
   <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/dp/" class="">
+      Dp</a>
+  
+
+        </li>
+      
     
   </ul>
 
@@ -464,6 +543,7 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
         <li></li>
       </ul>
     </li>
+    <li><a href="#ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)</a></li>
   </ul>
 </nav>
 
@@ -544,7 +624,9 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
 </span></span><span style="display:flex;"><span>wrapper(p);              <span style="color:#75715e">// 转发为左值，调用 real_function(Point&amp;)
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>wrapper(Point(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>));    <span style="color:#75715e">// 转发为右值，调用 real_function(Point&amp;&amp;)
 </span></span></span></code></pre></div><blockquote class='book-hint tip'>
-<p>如果形参是左值引用 如果传递了一个T类型的对象会自动为该函数创建一个左值引用。</p></blockquote></article>
+<p>如果形参是左值引用 如果传递了一个T类型的对象会自动为该函数创建一个左值引用。</p></blockquote><h2 id="ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)<a class="anchor" href="#ftlc-template-library-for-fans-of-functional-programming">#</a></h2>
+<p><a href="/Programming-Notes/docs/notes/c&amp;#43;&amp;#43;/ftl/">FTL</a></p>
+</article>
  
       
 
@@ -580,8 +662,8 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
     </span>
     <span>
     
-      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="flex align-center">
-        <span>Crtp</span>
+      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/" class="flex align-center">
+        <span>Coroutine</span>
         <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
       </a>
     
@@ -626,6 +708,7 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
         <li></li>
       </ul>
     </li>
+    <li><a href="#ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)</a></li>
   </ul>
 </nav>
 

@@ -8,24 +8,32 @@ https://github.com/alex-shpak/hugo-book
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="">
+<meta name="description" content="FTL#运算符#%运算符#%需要明确导入using ftl::operator%类似Functor功能。
+void functor() { using ftl::operator%; ftl::maybe&lt;int&gt; just = ftl::just(5); auto doubles = [](int x) { return x * 2; }; doubles % just; }»= 运算符#&gt;&gt;=运算符与haskell一致
+// 这里的std::list 是一个monad void flat(std::list&lt;int&gt; &amp;list) { using ftl::operator&gt;&gt;=; auto mapper = [](int x) { return std::list&lt;int&gt;{x - 1, x, x &#43; 1}; }; list = list &gt;&gt;= mapper; }">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
-<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/post/">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/ftl/">
   <meta property="og:site_name" content="Nazeltoの编程随记">
-  <meta property="og:title" content="Posts">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="FTL#运算符#%运算符#%需要明确导入using ftl::operator%类似Functor功能。
+void functor() { using ftl::operator%; ftl::maybe&lt;int&gt; just = ftl::just(5); auto doubles = [](int x) { return x * 2; }; doubles % just; }»= 运算符#&gt;&gt;=运算符与haskell一致
+// 这里的std::list 是一个monad void flat(std::list&lt;int&gt; &amp;list) { using ftl::operator&gt;&gt;=; auto mapper = [](int x) { return std::list&lt;int&gt;{x - 1, x, x &#43; 1}; }; list = list &gt;&gt;= mapper; }">
   <meta property="og:locale" content="zn_ch">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
 
 
-  <meta itemprop="name" content="Posts">
-  <meta itemprop="datePublished" content="2025-11-19T11:11:43+08:00">
-  <meta itemprop="dateModified" content="2025-11-19T11:11:43+08:00">
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="FTL#运算符#%运算符#%需要明确导入using ftl::operator%类似Functor功能。
+void functor() { using ftl::operator%; ftl::maybe&lt;int&gt; just = ftl::just(5); auto doubles = [](int x) { return x * 2; }; doubles % just; }»= 运算符#&gt;&gt;=运算符与haskell一致
+// 这里的std::list 是一个monad void flat(std::list&lt;int&gt; &amp;list) { using ftl::operator&gt;&gt;=; auto mapper = [](int x) { return std::list&lt;int&gt;{x - 1, x, x &#43; 1}; }; list = list &gt;&gt;= mapper; }">
+  <meta itemprop="wordCount" content="61">
 
-<title>Posts | Nazeltoの编程随记</title>
+<title>Ftl | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
 <link rel="manifest" href="/Programming-Notes/manifest.json">
-<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/post/">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/ftl/">
 <link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
 
 
@@ -33,11 +41,10 @@ https://github.com/alex-shpak/hugo-book
   <script defer src="/Programming-Notes/en.search.min.60ad33855082913ef36d1d886d055c45b19fb10d206f14c324679ff0aa5858e4.js" integrity="sha256-YK0zhVCCkT7zbR2IbQVcRbGfsQ0gbxTDJGef8KpYWOQ=" crossorigin="anonymous"></script>
 
 
-<link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/post/index.xml" title="Nazeltoの编程随记" />
 
   
 </head>
-<body dir="ltr" class="book-kind-section book-type-post">
+<body dir="ltr" class="book-kind-page book-type-docs">
   <input type="checkbox" class="hidden toggle" id="menu-control" />
   <input type="checkbox" class="hidden toggle" id="toc-control" />
   <main class="container flex">
@@ -200,7 +207,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <input type="checkbox" id="section-6d87527d98c3e3fb63eee838a8bbea11" class="toggle"  />
+    <input type="checkbox" id="section-6d87527d98c3e3fb63eee838a8bbea11" class="toggle" checked />
     <label for="section-6d87527d98c3e3fb63eee838a8bbea11" class="flex">
       <a href="/Programming-Notes/docs/notes/c&#43;&#43;/" class="">
         C&#43;&#43;</a>
@@ -246,7 +253,7 @@ https://github.com/alex-shpak/hugo-book
   
 
   
-    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/ftl/" class="">
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/ftl/" class="active">
       Ftl</a>
   
 
@@ -508,21 +515,57 @@ https://github.com/alex-shpak/hugo-book
     <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <h3>Posts</h3>
+  <h3>Ftl</h3>
 
   <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
     
   </label>
 </div>
 
 
   
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#运算符">运算符</a>
+      <ul>
+        <li><a href="#运算符-1">%运算符</a></li>
+        <li><a href="#-运算符">&raquo;= 运算符</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
  
       </header>
 
       
       
-  <article class="markdown book-article"></article>
+  <article class="markdown book-article"><h1 id="ftl">FTL<a class="anchor" href="#ftl">#</a></h1>
+<h2 id="运算符">运算符<a class="anchor" href="#%e8%bf%90%e7%ae%97%e7%ac%a6">#</a></h2>
+<h3 id="运算符-1">%运算符<a class="anchor" href="#%e8%bf%90%e7%ae%97%e7%ac%a6-1">#</a></h3>
+<p><code>%</code>需要明确导入<code>using ftl::operator%</code>类似Functor功能。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">functor</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">using</span> ftl<span style="color:#f92672">::</span><span style="color:#66d9ef">operator</span><span style="color:#f92672">%</span>;
+</span></span><span style="display:flex;"><span>  ftl<span style="color:#f92672">::</span>maybe<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> just <span style="color:#f92672">=</span> ftl<span style="color:#f92672">::</span>just(<span style="color:#ae81ff">5</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">auto</span> doubles <span style="color:#f92672">=</span> [](<span style="color:#66d9ef">int</span> x) { <span style="color:#66d9ef">return</span> x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>; };
+</span></span><span style="display:flex;"><span>  doubles <span style="color:#f92672">%</span> just;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="-运算符">&raquo;= 运算符<a class="anchor" href="#-%e8%bf%90%e7%ae%97%e7%ac%a6">#</a></h3>
+<p><code>&gt;&gt;=</code>运算符与haskell一致</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// 这里的std::list 是一个monad
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">flat</span>(std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>list) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">using</span> ftl<span style="color:#f92672">::</span><span style="color:#66d9ef">operator</span><span style="color:#f92672">&gt;&gt;=</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">auto</span> mapper <span style="color:#f92672">=</span> [](<span style="color:#66d9ef">int</span> x) { <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>{x <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>, x, x <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>}; };
+</span></span><span style="display:flex;"><span>  list <span style="color:#f92672">=</span> list <span style="color:#f92672">&gt;&gt;=</span> mapper;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div></article>
  
       
 
@@ -547,10 +590,33 @@ https://github.com/alex-shpak/hugo-book
   
   
   
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Crtp</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/nix/" class="flex align-center">
+        <span>Nix</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
 
 
  
         
+  
+  <div class="book-comments">
+
+</div>
   
  
         
@@ -569,6 +635,26 @@ https://github.com/alex-shpak/hugo-book
     </div>
 
     
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#运算符">运算符</a>
+      <ul>
+        <li><a href="#运算符-1">%运算符</a></li>
+        <li><a href="#-运算符">&raquo;= 运算符</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
   
  
   </main>

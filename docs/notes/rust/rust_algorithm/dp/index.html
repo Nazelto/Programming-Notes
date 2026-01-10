@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="动态规划#最长回文子串#偏函数式解法#pub fn longest_palindrome(s: String) -&gt; String { let len = s.len(); if len == 0 { return s; // 直接处理边界 } let s_ref = s.as_bytes(); let mut array: Vec&lt;Vec&lt;bool&gt;&gt; = vec![vec![false; len]; len]; // 简化数组 // 初始化：使用 map 处理 for i in 0..len { array[i][i] = true; // 可以用迭代器，但这里保持简单 } // 函数式处理 DP 填充：用高阶函数和 match fn fill_dp(array: &amp;mut Vec&lt;Vec&lt;bool&gt;&gt;, s_ref: &amp;[u8], len: usize) { for L in 2..=len { // 按长度迭代 (0..=len - L).for_each(|i| { let j = i &#43; L - 1; match (s_ref.get(i), s_ref.get(j)) { // 用 match 处理边界和相等 (Some(&amp;a), Some(&amp;b)) if a == b =&gt; { // 模式匹配检查相等 match L { 2 =&gt; array[i][j] = true, // 长度为 2 _ if i &lt; j - 1 &amp;&amp; array[i &#43; 1][j - 1] =&gt; array[i][j] = true, // 子问题 _ =&gt; array[i][j] = false, } } _ =&gt; array[i][j] = false, // 边界或不相等 } }); } } fill_dp(&amp;mut array, s_ref, len); // 调用函数 // 查找最长子串：用 fold 减少 if let (start, max_length) = (0..len).fold((0, 1), |(start, max_len), i| { let candidates: Vec&lt;(usize, usize)&gt; = (i..len) .filter(|&amp;j| array[i][j]) .map(|j| (i, j - i &#43; 1)) .filter(|&amp;(_, length)| length &gt; max_len) .collect(); if let Some(&amp;(new_start, new_length)) = candidates.iter().max_by_key(|&amp;&amp;(_, length)| length) { // 如果有候选，选择最大的 (new_start, new_length) } else { (start, max_len) // 无候选，保持原状态 } }); s[start..start &#43; max_length].to_string() // 返回结果 }">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_algorithm/dp/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="Nazeltoの编程随记">
+  <meta property="og:description" content="动态规划#最长回文子串#偏函数式解法#pub fn longest_palindrome(s: String) -&gt; String { let len = s.len(); if len == 0 { return s; // 直接处理边界 } let s_ref = s.as_bytes(); let mut array: Vec&lt;Vec&lt;bool&gt;&gt; = vec![vec![false; len]; len]; // 简化数组 // 初始化：使用 map 处理 for i in 0..len { array[i][i] = true; // 可以用迭代器，但这里保持简单 } // 函数式处理 DP 填充：用高阶函数和 match fn fill_dp(array: &amp;mut Vec&lt;Vec&lt;bool&gt;&gt;, s_ref: &amp;[u8], len: usize) { for L in 2..=len { // 按长度迭代 (0..=len - L).for_each(|i| { let j = i &#43; L - 1; match (s_ref.get(i), s_ref.get(j)) { // 用 match 处理边界和相等 (Some(&amp;a), Some(&amp;b)) if a == b =&gt; { // 模式匹配检查相等 match L { 2 =&gt; array[i][j] = true, // 长度为 2 _ if i &lt; j - 1 &amp;&amp; array[i &#43; 1][j - 1] =&gt; array[i][j] = true, // 子问题 _ =&gt; array[i][j] = false, } } _ =&gt; array[i][j] = false, // 边界或不相等 } }); } } fill_dp(&amp;mut array, s_ref, len); // 调用函数 // 查找最长子串：用 fold 减少 if let (start, max_length) = (0..len).fold((0, 1), |(start, max_len), i| { let candidates: Vec&lt;(usize, usize)&gt; = (i..len) .filter(|&amp;j| array[i][j]) .map(|j| (i, j - i &#43; 1)) .filter(|&amp;(_, length)| length &gt; max_len) .collect(); if let Some(&amp;(new_start, new_length)) = candidates.iter().max_by_key(|&amp;&amp;(_, length)| length) { // 如果有候选，选择最大的 (new_start, new_length) } else { (start, max_len) // 无候选，保持原状态 } }); s[start..start &#43; max_length].to_string() // 返回结果 }">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+
+
+  <meta itemprop="name" content="Nazeltoの编程随记">
+  <meta itemprop="description" content="动态规划#最长回文子串#偏函数式解法#pub fn longest_palindrome(s: String) -&gt; String { let len = s.len(); if len == 0 { return s; // 直接处理边界 } let s_ref = s.as_bytes(); let mut array: Vec&lt;Vec&lt;bool&gt;&gt; = vec![vec![false; len]; len]; // 简化数组 // 初始化：使用 map 处理 for i in 0..len { array[i][i] = true; // 可以用迭代器，但这里保持简单 } // 函数式处理 DP 填充：用高阶函数和 match fn fill_dp(array: &amp;mut Vec&lt;Vec&lt;bool&gt;&gt;, s_ref: &amp;[u8], len: usize) { for L in 2..=len { // 按长度迭代 (0..=len - L).for_each(|i| { let j = i &#43; L - 1; match (s_ref.get(i), s_ref.get(j)) { // 用 match 处理边界和相等 (Some(&amp;a), Some(&amp;b)) if a == b =&gt; { // 模式匹配检查相等 match L { 2 =&gt; array[i][j] = true, // 长度为 2 _ if i &lt; j - 1 &amp;&amp; array[i &#43; 1][j - 1] =&gt; array[i][j] = true, // 子问题 _ =&gt; array[i][j] = false, } } _ =&gt; array[i][j] = false, // 边界或不相等 } }); } } fill_dp(&amp;mut array, s_ref, len); // 调用函数 // 查找最长子串：用 fold 减少 if let (start, max_length) = (0..len).fold((0, 1), |(start, max_len), i| { let candidates: Vec&lt;(usize, usize)&gt; = (i..len) .filter(|&amp;j| array[i][j]) .map(|j| (i, j - i &#43; 1)) .filter(|&amp;(_, length)| length &gt; max_len) .collect(); if let Some(&amp;(new_start, new_length)) = candidates.iter().max_by_key(|&amp;&amp;(_, length)| length) { // 如果有候选，选择最大的 (new_start, new_length) } else { (start, max_len) // 无候选，保持原状态 } }); s[start..start &#43; max_length].to_string() // 返回结果 }">
+  <meta itemprop="wordCount" content="222">
+
+<title>Dp | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/rust/rust_algorithm/dp/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.60ad33855082913ef36d1d886d055c45b19fb10d206f14c324679ff0aa5858e4.js" integrity="sha256-YK0zhVCCkT7zbR2IbQVcRbGfsQ0gbxTDJGef8KpYWOQ=" crossorigin="anonymous"></script>
+
+
+
+  
+</head>
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-6d87527d98c3e3fb63eee838a8bbea11" class="toggle"  />
+    <label for="section-6d87527d98c3e3fb63eee838a8bbea11" class="flex">
+      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/" class="">
+        C&#43;&#43;</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/" class="">
+      Coroutine</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="">
+      Crtp</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/ftl/" class="">
+      Ftl</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dc456b687142a9e10cb3f8aed083df22" class="toggle"  />
+    <label for="section-dc456b687142a9e10cb3f8aed083df22" class="flex">
+      <a href="/Programming-Notes/docs/notes/nix/" class="">
+        Nix</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/nix/flake_parts/" class="">
+      Flake Parts</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle" checked />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="">
+      Rust Algorithm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/dp/" class="active">
+      Dp</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="">
+      Rust Iterator Adapters</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/" class="">
+      内部可变性</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/" class="">
+      Haskell</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/async/" class="">
+      Async</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/medical_imaging/" class="">
+      Medical Imaging</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>Dp</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#最长回文子串">最长回文子串</a>
+      <ul>
+        <li><a href="#偏函数式解法">偏函数式解法</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="动态规划">动态规划<a class="anchor" href="#%e5%8a%a8%e6%80%81%e8%a7%84%e5%88%92">#</a></h1>
+<h2 id="最长回文子串">最长回文子串<a class="anchor" href="#%e6%9c%80%e9%95%bf%e5%9b%9e%e6%96%87%e5%ad%90%e4%b8%b2">#</a></h2>
+<h3 id="偏函数式解法">偏函数式解法<a class="anchor" href="#%e5%81%8f%e5%87%bd%e6%95%b0%e5%bc%8f%e8%a7%a3%e6%b3%95">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">longest_palindrome</span>(s: String) -&gt; String {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> len <span style="color:#f92672">=</span> s.len();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> s; <span style="color:#75715e">// 直接处理边界
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> s_ref <span style="color:#f92672">=</span> s.as_bytes();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> array: Vec<span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">bool</span><span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#a6e22e">vec!</span>[<span style="color:#66d9ef">false</span>; len]; len]; <span style="color:#75715e">// 简化数组
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 初始化：使用 map 处理
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">..</span>len {
+</span></span><span style="display:flex;"><span>        array[i][i] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>; <span style="color:#75715e">// 可以用迭代器，但这里保持简单
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 函数式处理 DP 填充：用高阶函数和 match
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">fill_dp</span>(array: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> Vec<span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">bool</span><span style="color:#f92672">&gt;&gt;</span>, s_ref: <span style="color:#66d9ef">&amp;</span>[<span style="color:#66d9ef">u8</span>], len: <span style="color:#66d9ef">usize</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> L <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">..=</span>len {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 按长度迭代
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            (<span style="color:#ae81ff">0</span><span style="color:#f92672">..=</span>len <span style="color:#f92672">-</span> L).for_each(<span style="color:#f92672">|</span>i<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">+</span> L <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">match</span> (s_ref.get(i), s_ref.get(j)) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// 用 match 处理边界和相等
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    (Some(<span style="color:#f92672">&amp;</span>a), Some(<span style="color:#f92672">&amp;</span>b)) <span style="color:#66d9ef">if</span> a <span style="color:#f92672">==</span> b <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// 模式匹配检查相等
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                        <span style="color:#66d9ef">match</span> L {
+</span></span><span style="display:flex;"><span>                            <span style="color:#ae81ff">2</span> <span style="color:#f92672">=&gt;</span> array[i][j] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>,                                     <span style="color:#75715e">// 长度为 2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                            _ <span style="color:#66d9ef">if</span> i <span style="color:#f92672">&lt;</span> j <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> array[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>][j <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=&gt;</span> array[i][j] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>, <span style="color:#75715e">// 子问题
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                            _ <span style="color:#f92672">=&gt;</span> array[i][j] <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                    _ <span style="color:#f92672">=&gt;</span> array[i][j] <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>, <span style="color:#75715e">// 边界或不相等
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                }
+</span></span><span style="display:flex;"><span>            });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    fill_dp(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> array, s_ref, len); <span style="color:#75715e">// 调用函数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 查找最长子串：用 fold 减少 if
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> (start, max_length) <span style="color:#f92672">=</span> (<span style="color:#ae81ff">0</span><span style="color:#f92672">..</span>len).fold((<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>), <span style="color:#f92672">|</span>(start, max_len), i<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> candidates: Vec<span style="color:#f92672">&lt;</span>(<span style="color:#66d9ef">usize</span>, <span style="color:#66d9ef">usize</span>)<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> (i<span style="color:#f92672">..</span>len)
+</span></span><span style="display:flex;"><span>            .filter(<span style="color:#f92672">|&amp;</span>j<span style="color:#f92672">|</span> array[i][j])
+</span></span><span style="display:flex;"><span>            .map(<span style="color:#f92672">|</span>j<span style="color:#f92672">|</span> (i, j <span style="color:#f92672">-</span> i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>))
+</span></span><span style="display:flex;"><span>            .filter(<span style="color:#f92672">|&amp;</span>(_, length)<span style="color:#f92672">|</span> length <span style="color:#f92672">&gt;</span> max_len)
+</span></span><span style="display:flex;"><span>            .collect();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(<span style="color:#f92672">&amp;</span>(new_start, new_length)) <span style="color:#f92672">=</span> candidates.iter().max_by_key(<span style="color:#f92672">|&amp;&amp;</span>(_, length)<span style="color:#f92672">|</span> length)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 如果有候选，选择最大的
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            (new_start, new_length)
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            (start, max_len) <span style="color:#75715e">// 无候选，保持原状态
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    s[start<span style="color:#f92672">..</span>start <span style="color:#f92672">+</span> max_length].to_string() <span style="color:#75715e">// 返回结果
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}</span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Rust Algorithm</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="flex align-center">
+        <span>Rust Crate</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#最长回文子串">最长回文子串</a>
+      <ul>
+        <li><a href="#偏函数式解法">偏函数式解法</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
