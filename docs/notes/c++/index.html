@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zn-ch" dir="ltr">
-<head>
+<head><script src="/Programming-Notes/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=Programming-Notes/livereload" data-no-instant defer></script>
   <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -16,7 +16,7 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
 ">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
-<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://localhost:1313/Programming-Notes/docs/notes/c&#43;&#43;/">
   <meta property="og:site_name" content="Nazeltoの编程随记">
   <meta property="og:title" content="C&#43;&#43;">
   <meta property="og:description" content="Cpp笔记#现代c&#43;&#43;初始化#auto#auto s = 123;聚类初始化#聚类初始化只有结构体、类、容器等才可以使用
@@ -34,20 +34,20 @@ class Point { int x,y,z; }; // 聚类语法中未初始化的值使用默认值 
 Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有权”概念的类型
 //基本类型可不使用移动构造 Point (Point &amp;&amp;Other) noexcept: x(Other.x),y(Other.y) {} 万能引用#万能引用识别条件
 必须是模板参数 T&amp;&amp; 必须有类型推导 template&lt;typename T&gt; void func(T&amp;&amp; param) { // param 可以绑定到任何东西 } Point p; const Point cp; func(p); // T = Point&amp;, param 类型是 Point&amp; func(cp); // T = const Point&amp;, param 类型是 const Point&amp; func(Point(1, 2)); // T = Point, param 类型是 Point&amp;&amp; func(std::move(p)); // T = Point, param 类型是 Point&amp;&amp; 引用折叠规则#T&amp; &amp; → T&amp; // 左值引用 &#43; 左值引用 = 左值引用 T&amp; &amp;&amp; → T&amp; // 左值引用 &#43; 右值引用 = 左值引用 T&amp;&amp; &amp; → T&amp; // 右值引用 &#43; 左值引用 = 左值引用 T&amp;&amp; &amp;&amp; → T&amp;&amp; // 右值引用 &#43; 右值引用 = 右值引用 完美转发#template&lt;typename T&gt; void wrapper(T&amp;&amp; param) { real_function(param); // ❌ 问题：param 总是左值！ } void real_function(Point&amp; p) { std::cout &lt;&lt; &#34;左值版本\n&#34;; } void real_function(Point&amp;&amp; p) { std::cout &lt;&lt; &#34;右值版本\n&#34;; } Point p; wrapper(p); // 调用左值版本 ✓ wrapper(Point(1, 2)); // 还是调用左值版本！✗ 核心问题：即使 param 绑定到右值，param 本身作为表达式是左值！">
-  <meta itemprop="wordCount" content="209">
+  <meta itemprop="wordCount" content="272">
 
 <title>C&#43;&#43; | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
 <link rel="manifest" href="/Programming-Notes/manifest.json">
-<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/">
+<link rel="canonical" href="http://localhost:1313/Programming-Notes/docs/notes/c&#43;&#43;/">
 <link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
 
 
   <script defer src="/Programming-Notes/fuse.min.js"></script>
-  <script defer src="/Programming-Notes/en.search.min.60ad33855082913ef36d1d886d055c45b19fb10d206f14c324679ff0aa5858e4.js" integrity="sha256-YK0zhVCCkT7zbR2IbQVcRbGfsQ0gbxTDJGef8KpYWOQ=" crossorigin="anonymous"></script>
+  <script defer src="/Programming-Notes/en.search.min.19c452d808cf4d39c33c0175cb5002e34a8d43afe26037762177203a9c988223.js" integrity="sha256-GcRS2AjPTTnDPAF1y1AC40qNQ6/iYDd2IXcgOpyYgiM=" crossorigin="anonymous"></script>
 
 
-<link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/docs/notes/c++/index.xml" title="Nazeltoの编程随记" />
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/Programming-Notes/docs/notes/c++/index.xml" title="Nazeltoの编程随记" />
 
   
 </head>
@@ -246,8 +246,50 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
   
 
   
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/cpp_export_macros/" class="">
+      Cpp Export Macros</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
     <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="">
       Crtp</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/cuda/" class="">
+      Cuda</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/extern/" class="">
+      Extern</a>
   
 
         </li>
@@ -379,6 +421,20 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
   <ul>
     
   </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/cuda/" class="">
+      Cuda</a>
+  
 
         </li>
       
@@ -544,6 +600,13 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
       </ul>
     </li>
     <li><a href="#ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)</a></li>
+    <li><a href="#库的创建">库的创建</a>
+      <ul>
+        <li><a href="#header-only">header-only</a></li>
+        <li><a href="#传统库文件头文件">传统库文件+头文件</a></li>
+        <li><a href="#导出宏">导出宏</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -626,7 +689,32 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
 </span></span></span></code></pre></div><blockquote class='book-hint tip'>
 <p>如果形参是左值引用 如果传递了一个T类型的对象会自动为该函数创建一个左值引用。</p></blockquote><h2 id="ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)<a class="anchor" href="#ftlc-template-library-for-fans-of-functional-programming">#</a></h2>
 <p><a href="/Programming-Notes/docs/notes/c&amp;#43;&amp;#43;/ftl/">FTL</a></p>
-</article>
+<h2 id="库的创建">库的创建<a class="anchor" href="#%e5%ba%93%e7%9a%84%e5%88%9b%e5%bb%ba">#</a></h2>
+<h3 id="header-only">header-only<a class="anchor" href="#header-only">#</a></h3>
+<p>只有头文件并且实现也在头文件中。(.hpp文件)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// temp.hpp
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span> (<span style="color:#66d9ef">int</span> a,<span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a <span style="color:#f92672">+</span> b;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="传统库文件头文件">传统库文件+头文件<a class="anchor" href="#%e4%bc%a0%e7%bb%9f%e5%ba%93%e6%96%87%e4%bb%b6%e5%a4%b4%e6%96%87%e4%bb%b6">#</a></h3>
+<p>头文件声明函数细节;库文件实现</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// temp.h
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//模板参数只能声明在头文件
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">int</span> a,<span style="color:#66d9ef">int</span> b);</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;temp.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">int</span> a,<span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a <span style="color:#f92672">+</span> b;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="导出宏">导出宏<a class="anchor" href="#%e5%af%bc%e5%87%ba%e5%ae%8f">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#ifdef MYLIB_EXPORTS
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">#define MYLIB_API __declspec(dllexport)  </span><span style="color:#75715e">// ← 导出
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">#define MYLIB_API __declspec(dllimport)  </span><span style="color:#75715e">// ← 导入
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#endif</span></span></span></code></pre></div><p>可通过xmake或者命令行定义导出宏。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">//从DLL中导入通过
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//该头文件需要安装
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;mylib.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">auto</span> a <span style="color:#f92672">=</span> add(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div></article>
  
       
 
@@ -709,6 +797,13 @@ Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有
       </ul>
     </li>
     <li><a href="#ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)</a></li>
+    <li><a href="#库的创建">库的创建</a>
+      <ul>
+        <li><a href="#header-only">header-only</a></li>
+        <li><a href="#传统库文件头文件">传统库文件+头文件</a></li>
+        <li><a href="#导出宏">导出宏</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 

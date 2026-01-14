@@ -10,7 +10,7 @@
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/zig/</loc>
   </url><url>
-    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/</loc>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/nix/</loc>
   </url><url>
@@ -26,11 +26,17 @@
     <loc>https://nazelto.github.io/Programming-Notes/post/</loc>
     <lastmod>2025-11-19T11:11:43+08:00</lastmod>
   </url><url>
-    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/</loc>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/coroutine/</loc>
   </url><url>
-    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/crtp/</loc>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/cpp_export_macros/</loc>
   </url><url>
-    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/ftl/</loc>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/crtp/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/cuda/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/extern/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/cpp/ftl/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/haskell/</loc>
   </url><url>
@@ -45,6 +51,8 @@
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/python/itertools/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/python/modern_python/</loc>
+  </url><url>
+    <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/cuda/</loc>
   </url><url>
     <loc>https://nazelto.github.io/Programming-Notes/docs/notes/rust/lifetime/</loc>
   </url><url>

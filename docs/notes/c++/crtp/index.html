@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zn-ch" dir="ltr">
-<head>
+<head><script src="/Programming-Notes/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=Programming-Notes/livereload" data-no-instant defer></script>
   <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -14,7 +14,7 @@ concept Print = requires { { std::declval&lt;const T &amp;&gt;().to_string() } -
 // CRTP: 模板模板参数 template &lt;template &lt;typename&gt; class... Capabilities&gt; class Student : public Capabilities&lt;Student&lt;Capabilities...&gt;&gt;... { public: std::string name{&#34;liuda&#34;}; int age{10}; std::string to_string(this const Student &amp;self) { return std::format(&#34;name: {},age: {}&#34;, self.name, self.age); }; }; //这样声明的类可以组合功能 int main() { Student&lt;Printable&gt; student1{}; //Student&lt;Printable,Compareable&gt;student1{}; }">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
-<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/crtp/">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://localhost:1313/Programming-Notes/docs/notes/c&#43;&#43;/crtp/">
   <meta property="og:site_name" content="Nazeltoの编程随记">
   <meta property="og:title" content="Nazeltoの编程随记">
   <meta property="og:description" content="奇异模板递归#Concept#类似于rust trait bounds概念
@@ -36,12 +36,12 @@ concept Print = requires { { std::declval&lt;const T &amp;&gt;().to_string() } -
 <title>Crtp | Nazeltoの编程随记</title>
 <link rel="icon" href="/Programming-Notes/favicon.png" >
 <link rel="manifest" href="/Programming-Notes/manifest.json">
-<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/c&#43;&#43;/crtp/">
+<link rel="canonical" href="http://localhost:1313/Programming-Notes/docs/notes/c&#43;&#43;/crtp/">
 <link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
 
 
   <script defer src="/Programming-Notes/fuse.min.js"></script>
-  <script defer src="/Programming-Notes/en.search.min.60ad33855082913ef36d1d886d055c45b19fb10d206f14c324679ff0aa5858e4.js" integrity="sha256-YK0zhVCCkT7zbR2IbQVcRbGfsQ0gbxTDJGef8KpYWOQ=" crossorigin="anonymous"></script>
+  <script defer src="/Programming-Notes/en.search.min.19c452d808cf4d39c33c0175cb5002e34a8d43afe26037762177203a9c988223.js" integrity="sha256-GcRS2AjPTTnDPAF1y1AC40qNQ6/iYDd2IXcgOpyYgiM=" crossorigin="anonymous"></script>
 
 
 
@@ -242,8 +242,50 @@ concept Print = requires { { std::declval&lt;const T &amp;&gt;().to_string() } -
   
 
   
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/cpp_export_macros/" class="">
+      Cpp Export Macros</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
     <a href="/Programming-Notes/docs/notes/c&#43;&#43;/crtp/" class="active">
       Crtp</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/cuda/" class="">
+      Cuda</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/c&#43;&#43;/extern/" class="">
+      Extern</a>
   
 
         </li>
@@ -375,6 +417,20 @@ concept Print = requires { { std::declval&lt;const T &amp;&gt;().to_string() } -
   <ul>
     
   </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/cuda/" class="">
+      Cuda</a>
+  
 
         </li>
       
@@ -617,16 +673,16 @@ concept Print = requires { { std::declval&lt;const T &amp;&gt;().to_string() } -
   <div class="flex flex-wrap justify-between">
     <span>
     
-      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/coroutine/" class="flex align-center">
+      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/cpp_export_macros/" class="flex align-center">
         <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
-        <span>Coroutine</span>
+        <span>Cpp Export Macros</span>
       </a>
     
     </span>
     <span>
     
-      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/ftl/" class="flex align-center">
-        <span>Ftl</span>
+      <a href="/Programming-Notes/docs/notes/c&#43;&#43;/cuda/" class="flex align-center">
+        <span>Cuda</span>
         <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
       </a>
     

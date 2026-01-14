@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zn-ch" dir="ltr">
+<head>
+  <!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cpp笔记#现代c&#43;&#43;初始化#auto#auto s = 123;聚类初始化#聚类初始化只有结构体、类、容器等才可以使用
+class Point { int x,y,z; }; // 聚类语法中未初始化的值使用默认值 Point {.x = 1,.y = 1};列表初始化#int a{0}; std::vector&lt;int&gt; vec{1,2,3};如果想为自己的类添加列表初始化，需要创建构造函数且在传递时参数一定是要按顺序的
+Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有权”概念的类型
+//基本类型可不使用移动构造 Point (Point &amp;&amp;Other) noexcept: x(Other.x),y(Other.y) {} 万能引用#万能引用识别条件
+必须是模板参数 T&amp;&amp; 必须有类型推导 template&lt;typename T&gt; void func(T&amp;&amp; param) { // param 可以绑定到任何东西 } Point p; const Point cp; func(p); // T = Point&amp;, param 类型是 Point&amp; func(cp); // T = const Point&amp;, param 类型是 const Point&amp; func(Point(1, 2)); // T = Point, param 类型是 Point&amp;&amp; func(std::move(p)); // T = Point, param 类型是 Point&amp;&amp; 引用折叠规则#T&amp; &amp; → T&amp; // 左值引用 &#43; 左值引用 = 左值引用 T&amp; &amp;&amp; → T&amp; // 左值引用 &#43; 右值引用 = 左值引用 T&amp;&amp; &amp; → T&amp; // 右值引用 &#43; 左值引用 = 左值引用 T&amp;&amp; &amp;&amp; → T&amp;&amp; // 右值引用 &#43; 右值引用 = 右值引用 完美转发#template&lt;typename T&gt; void wrapper(T&amp;&amp; param) { real_function(param); // ❌ 问题：param 总是左值！ } void real_function(Point&amp; p) { std::cout &lt;&lt; &#34;左值版本\n&#34;; } void real_function(Point&amp;&amp; p) { std::cout &lt;&lt; &#34;右值版本\n&#34;; } Point p; wrapper(p); // 调用左值版本 ✓ wrapper(Point(1, 2)); // 还是调用左值版本！✗ 核心问题：即使 param 绑定到右值，param 本身作为表达式是左值！
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="https://nazelto.github.io/Programming-Notes/docs/notes/cpp/">
+  <meta property="og:site_name" content="Nazeltoの编程随记">
+  <meta property="og:title" content="C&#43;&#43;">
+  <meta property="og:description" content="Cpp笔记#现代c&#43;&#43;初始化#auto#auto s = 123;聚类初始化#聚类初始化只有结构体、类、容器等才可以使用
+class Point { int x,y,z; }; // 聚类语法中未初始化的值使用默认值 Point {.x = 1,.y = 1};列表初始化#int a{0}; std::vector&lt;int&gt; vec{1,2,3};如果想为自己的类添加列表初始化，需要创建构造函数且在传递时参数一定是要按顺序的
+Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有权”概念的类型
+//基本类型可不使用移动构造 Point (Point &amp;&amp;Other) noexcept: x(Other.x),y(Other.y) {} 万能引用#万能引用识别条件
+必须是模板参数 T&amp;&amp; 必须有类型推导 template&lt;typename T&gt; void func(T&amp;&amp; param) { // param 可以绑定到任何东西 } Point p; const Point cp; func(p); // T = Point&amp;, param 类型是 Point&amp; func(cp); // T = const Point&amp;, param 类型是 const Point&amp; func(Point(1, 2)); // T = Point, param 类型是 Point&amp;&amp; func(std::move(p)); // T = Point, param 类型是 Point&amp;&amp; 引用折叠规则#T&amp; &amp; → T&amp; // 左值引用 &#43; 左值引用 = 左值引用 T&amp; &amp;&amp; → T&amp; // 左值引用 &#43; 右值引用 = 左值引用 T&amp;&amp; &amp; → T&amp; // 右值引用 &#43; 左值引用 = 左值引用 T&amp;&amp; &amp;&amp; → T&amp;&amp; // 右值引用 &#43; 右值引用 = 右值引用 完美转发#template&lt;typename T&gt; void wrapper(T&amp;&amp; param) { real_function(param); // ❌ 问题：param 总是左值！ } void real_function(Point&amp; p) { std::cout &lt;&lt; &#34;左值版本\n&#34;; } void real_function(Point&amp;&amp; p) { std::cout &lt;&lt; &#34;右值版本\n&#34;; } Point p; wrapper(p); // 调用左值版本 ✓ wrapper(Point(1, 2)); // 还是调用左值版本！✗ 核心问题：即使 param 绑定到右值，param 本身作为表达式是左值！">
+  <meta property="og:locale" content="zn_ch">
+  <meta property="og:type" content="website">
+
+
+  <meta itemprop="name" content="C&#43;&#43;">
+  <meta itemprop="description" content="Cpp笔记#现代c&#43;&#43;初始化#auto#auto s = 123;聚类初始化#聚类初始化只有结构体、类、容器等才可以使用
+class Point { int x,y,z; }; // 聚类语法中未初始化的值使用默认值 Point {.x = 1,.y = 1};列表初始化#int a{0}; std::vector&lt;int&gt; vec{1,2,3};如果想为自己的类添加列表初始化，需要创建构造函数且在传递时参数一定是要按顺序的
+Point(std::initializer_list&lt;int&gt;){};移动构造#指针是具有“所有权”概念的类型
+//基本类型可不使用移动构造 Point (Point &amp;&amp;Other) noexcept: x(Other.x),y(Other.y) {} 万能引用#万能引用识别条件
+必须是模板参数 T&amp;&amp; 必须有类型推导 template&lt;typename T&gt; void func(T&amp;&amp; param) { // param 可以绑定到任何东西 } Point p; const Point cp; func(p); // T = Point&amp;, param 类型是 Point&amp; func(cp); // T = const Point&amp;, param 类型是 const Point&amp; func(Point(1, 2)); // T = Point, param 类型是 Point&amp;&amp; func(std::move(p)); // T = Point, param 类型是 Point&amp;&amp; 引用折叠规则#T&amp; &amp; → T&amp; // 左值引用 &#43; 左值引用 = 左值引用 T&amp; &amp;&amp; → T&amp; // 左值引用 &#43; 右值引用 = 左值引用 T&amp;&amp; &amp; → T&amp; // 右值引用 &#43; 左值引用 = 左值引用 T&amp;&amp; &amp;&amp; → T&amp;&amp; // 右值引用 &#43; 右值引用 = 右值引用 完美转发#template&lt;typename T&gt; void wrapper(T&amp;&amp; param) { real_function(param); // ❌ 问题：param 总是左值！ } void real_function(Point&amp; p) { std::cout &lt;&lt; &#34;左值版本\n&#34;; } void real_function(Point&amp;&amp; p) { std::cout &lt;&lt; &#34;右值版本\n&#34;; } Point p; wrapper(p); // 调用左值版本 ✓ wrapper(Point(1, 2)); // 还是调用左值版本！✗ 核心问题：即使 param 绑定到右值，param 本身作为表达式是左值！">
+  <meta itemprop="wordCount" content="272">
+
+<title>C&#43;&#43; | Nazeltoの编程随记</title>
+<link rel="icon" href="/Programming-Notes/favicon.png" >
+<link rel="manifest" href="/Programming-Notes/manifest.json">
+<link rel="canonical" href="https://nazelto.github.io/Programming-Notes/docs/notes/cpp/">
+<link rel="stylesheet" href="/Programming-Notes/book.min.6970156cec683193d93c9c4edaf0d56574e4361df2e0c1be4f697ae81c3ba55f.css" integrity="sha256-aXAVbOxoMZPZPJxO2vDVZXTkNh3y4MG&#43;T2l66Bw7pV8=" crossorigin="anonymous">
+
+
+  <script defer src="/Programming-Notes/fuse.min.js"></script>
+  <script defer src="/Programming-Notes/en.search.min.dff42f3564463e6d1fc137a19c77df568f4cf67c6b57db4ac01103f19d95d09f.js" integrity="sha256-3/QvNWRGPm0fwTehnHffVo9M9nxrV9tKwBED8Z2V0J8=" crossorigin="anonymous"></script>
+
+
+<link rel="alternate" type="application/rss+xml" href="https://nazelto.github.io/Programming-Notes/docs/notes/cpp/index.xml" title="Nazeltoの编程随记" />
+
+  
+</head>
+<body dir="ltr" class="book-kind-section book-type-docs">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    
+<aside class="book-menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/Programming-Notes/"><span>Nazeltoの编程随记</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" 
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li class="book-section-flat" >
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/" class="">
+      Introduction</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="toggle"  />
+    <label for="section-b0c009d8e04ed4f3e4b607bcb99eff24" class="flex">
+      <a href="/Programming-Notes/docs/notes/python/" class="">
+        Python</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/functional_py/" class="">
+      Functional Py</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/itertools/" class="">
+      Itertools</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/python/modern_python/" class="">
+      Modern Python</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-7b7ba33566a4bb9cee04ebe046f31a19" class="toggle"  />
+    <label for="section-7b7ba33566a4bb9cee04ebe046f31a19" class="flex">
+      <a href="/Programming-Notes/docs/notes/zig/" class="">
+        Zig</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="">
+      Zig Grammar</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-693e7216f93519b9076d26fb8bd1175c" class="toggle" checked />
+    <label for="section-693e7216f93519b9076d26fb8bd1175c" class="flex">
+      <a href="/Programming-Notes/docs/notes/cpp/" class="active">
+        C&#43;&#43;</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/cpp/coroutine/" class="">
+      Coroutine</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/cpp/cpp_export_macros/" class="">
+      Cpp Export Macros</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/cpp/crtp/" class="">
+      Crtp</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/cpp/cuda/" class="">
+      Cuda</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/cpp/extern/" class="">
+      Extern</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/cpp/ftl/" class="">
+      Ftl</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-dc456b687142a9e10cb3f8aed083df22" class="toggle"  />
+    <label for="section-dc456b687142a9e10cb3f8aed083df22" class="flex">
+      <a href="/Programming-Notes/docs/notes/nix/" class="">
+        Nix</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/nix/flake_parts/" class="">
+      Flake Parts</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-fb6aca9a5328c1176bf64374f8ad4b13" class="toggle"  />
+    <label for="section-fb6aca9a5328c1176bf64374f8ad4b13" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/" class="">
+        Rust</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/" class="">
+      Rust Algorithm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_algorithm/dp/" class="">
+      Dp</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <input type="checkbox" id="section-9bf5a1677816b6db3cc4d811115e9580" class="toggle"  />
+    <label for="section-9bf5a1677816b6db3cc4d811115e9580" class="flex">
+      <a href="/Programming-Notes/docs/notes/rust/crate/" class="">
+        Rust Crate</a>
+      <img src="/Programming-Notes/icons/chevron-right.svg" class="book-icon" alt="Expand" />
+    </label>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/cuda/" class="">
+      Cuda</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/lifetime/" class="">
+      Lifetime</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/rust_iterator_adapters/" class="">
+      Rust Iterator Adapters</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/rust/%E5%86%85%E9%83%A8%E5%8F%AF%E5%8F%98%E6%80%A7/" class="">
+      内部可变性</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/" class="">
+      Haskell</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/haskell/async/" class="">
+      Async</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/Programming-Notes/docs/notes/medical_imaging/" class="">
+      Medical Imaging</a>
+  
+
+          
+  <ul>
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/Programming-Notes/icons/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>C&#43;&#43;</h3>
+
+  <label for="toc-control">
+    
+    <img src="/Programming-Notes/icons/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#现代c初始化">现代c++初始化</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)</a></li>
+    <li><a href="#库的创建">库的创建</a>
+      <ul>
+        <li><a href="#header-only">header-only</a></li>
+        <li><a href="#传统库文件头文件">传统库文件+头文件</a></li>
+        <li><a href="#导出宏">导出宏</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><h1 id="cpp笔记">Cpp笔记<a class="anchor" href="#cpp%e7%ac%94%e8%ae%b0">#</a></h1>
+<h2 id="现代c初始化">现代c++初始化<a class="anchor" href="#%e7%8e%b0%e4%bb%a3c%e5%88%9d%e5%a7%8b%e5%8c%96">#</a></h2>
+<h4 id="auto">auto<a class="anchor" href="#auto">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">auto</span> s <span style="color:#f92672">=</span> <span style="color:#ae81ff">123</span>;</span></span></code></pre></div><h4 id="聚类初始化">聚类初始化<a class="anchor" href="#%e8%81%9a%e7%b1%bb%e5%88%9d%e5%a7%8b%e5%8c%96">#</a></h4>
+<p>聚类初始化只有结构体、类、容器等才可以使用</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Point</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> x,y,z;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 聚类语法中未初始化的值使用默认值
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Point {.x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>,.y <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>};</span></span></code></pre></div><h4 id="列表初始化">列表初始化<a class="anchor" href="#%e5%88%97%e8%a1%a8%e5%88%9d%e5%a7%8b%e5%8c%96">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> a{<span style="color:#ae81ff">0</span>};
+</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> vec{<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>};</span></span></code></pre></div><p>如果想为自己的类添加列表初始化，需要创建构造函数且在传递时参数一定是要按顺序的</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span>Point(std<span style="color:#f92672">::</span>initializer_list<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>){};</span></span></code></pre></div><h4 id="移动构造">移动构造<a class="anchor" href="#%e7%a7%bb%e5%8a%a8%e6%9e%84%e9%80%a0">#</a></h4>
+<blockquote class='book-hint tip'>
+<p>指针是具有“所有权”概念的类型</p></blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">//基本类型可不使用移动构造
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Point (Point <span style="color:#f92672">&amp;&amp;</span>Other) <span style="color:#66d9ef">noexcept</span><span style="color:#f92672">:</span> x(Other.x),y(Other.y) {} 
+</span></span></code></pre></div><h5 id="万能引用">万能引用<a class="anchor" href="#%e4%b8%87%e8%83%bd%e5%bc%95%e7%94%a8">#</a></h5>
+<p>万能引用识别条件</p>
+<ol>
+<li>必须是模板参数 T&amp;&amp;</li>
+<li>必须有类型推导</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> func(T<span style="color:#f92672">&amp;&amp;</span> param) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// param 可以绑定到任何东西
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Point p;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> Point cp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>func(p);              <span style="color:#75715e">// T = Point&amp;,       param 类型是 Point&amp;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>func(cp);             <span style="color:#75715e">// T = const Point&amp;, param 类型是 const Point&amp;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>func(Point(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>));    <span style="color:#75715e">// T = Point,        param 类型是 Point&amp;&amp;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>func(std<span style="color:#f92672">::</span>move(p));   <span style="color:#75715e">// T = Point,        param 类型是 Point&amp;&amp;
+</span></span></span></code></pre></div><h5 id="引用折叠规则">引用折叠规则<a class="anchor" href="#%e5%bc%95%e7%94%a8%e6%8a%98%e5%8f%a0%e8%a7%84%e5%88%99">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span>T<span style="color:#f92672">&amp;</span> <span style="color:#f92672">&amp;</span>   <span style="color:#960050;background-color:#1e0010">→</span> T<span style="color:#f92672">&amp;</span>      <span style="color:#75715e">// 左值引用 + 左值引用 = 左值引用
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>T<span style="color:#f92672">&amp;</span> <span style="color:#f92672">&amp;&amp;</span>  <span style="color:#960050;background-color:#1e0010">→</span> T<span style="color:#f92672">&amp;</span>      <span style="color:#75715e">// 左值引用 + 右值引用 = 左值引用
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>T<span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">&amp;</span>  <span style="color:#960050;background-color:#1e0010">→</span> T<span style="color:#f92672">&amp;</span>      <span style="color:#75715e">// 右值引用 + 左值引用 = 左值引用
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>T<span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#960050;background-color:#1e0010">→</span> T<span style="color:#f92672">&amp;&amp;</span>     <span style="color:#75715e">// 右值引用 + 右值引用 = 右值引用
+</span></span></span></code></pre></div><h5 id="完美转发">完美转发<a class="anchor" href="#%e5%ae%8c%e7%be%8e%e8%bd%ac%e5%8f%91">#</a></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> wrapper(T<span style="color:#f92672">&amp;&amp;</span> param) {
+</span></span><span style="display:flex;"><span>    real_function(param);  <span style="color:#75715e">// ❌ 问题：param 总是左值！
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">real_function</span>(Point<span style="color:#f92672">&amp;</span> p) { 
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;左值版本</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; 
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">real_function</span>(Point<span style="color:#f92672">&amp;&amp;</span> p) { 
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;右值版本</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; 
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Point p;
+</span></span><span style="display:flex;"><span>wrapper(p);              <span style="color:#75715e">// 调用左值版本 ✓
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>wrapper(Point(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>));    <span style="color:#75715e">// 还是调用左值版本！✗
+</span></span></span></code></pre></div><p><strong>核心问题</strong>：即使 param 绑定到右值，param 本身作为<strong>表达式</strong>是<strong>左值</strong>！</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">//std::forward 完美转发参数的值类别
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> wrapper(T<span style="color:#f92672">&amp;&amp;</span> param) {
+</span></span><span style="display:flex;"><span>    real_function(std<span style="color:#f92672">::</span>forward<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(param));  <span style="color:#75715e">// ✓ 完美转发
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Point p;
+</span></span><span style="display:flex;"><span>wrapper(p);              <span style="color:#75715e">// 转发为左值，调用 real_function(Point&amp;)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>wrapper(Point(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>));    <span style="color:#75715e">// 转发为右值，调用 real_function(Point&amp;&amp;)
+</span></span></span></code></pre></div><blockquote class='book-hint tip'>
+<p>如果形参是左值引用 如果传递了一个T类型的对象会自动为该函数创建一个左值引用。</p></blockquote><h2 id="ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)<a class="anchor" href="#ftlc-template-library-for-fans-of-functional-programming">#</a></h2>
+<p><a href="/Programming-Notes/docs/notes/cpp/ftl/">FTL</a></p>
+<h2 id="库的创建">库的创建<a class="anchor" href="#%e5%ba%93%e7%9a%84%e5%88%9b%e5%bb%ba">#</a></h2>
+<h3 id="header-only">header-only<a class="anchor" href="#header-only">#</a></h3>
+<p>只有头文件并且实现也在头文件中。(.hpp文件)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// temp.hpp
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span> (<span style="color:#66d9ef">int</span> a,<span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a <span style="color:#f92672">+</span> b;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="传统库文件头文件">传统库文件+头文件<a class="anchor" href="#%e4%bc%a0%e7%bb%9f%e5%ba%93%e6%96%87%e4%bb%b6%e5%a4%b4%e6%96%87%e4%bb%b6">#</a></h3>
+<p>头文件声明函数细节;库文件实现</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// temp.h
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//模板参数只能声明在头文件
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">int</span> a,<span style="color:#66d9ef">int</span> b);</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;temp.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">int</span> a,<span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> a <span style="color:#f92672">+</span> b;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="导出宏">导出宏<a class="anchor" href="#%e5%af%bc%e5%87%ba%e5%ae%8f">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#ifdef MYLIB_EXPORTS
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">#define MYLIB_API __declspec(dllexport)  </span><span style="color:#75715e">// ← 导出
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">#define MYLIB_API __declspec(dllimport)  </span><span style="color:#75715e">// ← 导入
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#endif</span></span></span></code></pre></div><p>可通过xmake或者命令行定义导出宏。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">//从DLL中导入通过
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//该头文件需要安装
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;mylib.h&#34;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">auto</span> a <span style="color:#f92672">=</span> add(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div></article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  
+  <div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/zig/zig-grammar/" class="flex align-center">
+        <img src="/Programming-Notes/icons/backward.svg" class="book-icon" alt="Backward" />
+        <span>Zig Grammar</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/Programming-Notes/docs/notes/cpp/coroutine/" class="flex align-center">
+        <span>Coroutine</span>
+        <img src="/Programming-Notes/icons/forward.svg" class="book-icon" alt="Forward" />
+      </a>
+    
+    </span>
+  </div>
+  
+
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+        
+        
+  
+ 
+        
+  
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+  
+  <aside class="book-toc">
+    <div class="book-toc-content">
+      
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#现代c初始化">现代c++初始化</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#ftlc-template-library-for-fans-of-functional-programming">FTL(C++ template library for fans of functional programming)</a></li>
+    <li><a href="#库的创建">库的创建</a>
+      <ul>
+        <li><a href="#header-only">header-only</a></li>
+        <li><a href="#传统库文件头文件">传统库文件+头文件</a></li>
+        <li><a href="#导出宏">导出宏</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+
+    </div>
+  </aside>
+  
+ 
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
